@@ -73,7 +73,7 @@ geoknow.Query = Backbone.Model.extend({
                 'result_format': this.get('resultFormat'),
                 'query': this.get('query'),
             },
-            timeout: 5e3, /* millis */
+            timeout: 15e3, /* millis */
         });
         
         jqxhr.done(_.bind(this.handleSuccess, this));

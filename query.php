@@ -192,7 +192,8 @@ class ParliamentQuery extends BaseQuery
             {
                 // Extract <table> subtree
                 $doc = simplexml_load_string($result);
-                $doc->registerXPathNamespace('xhtml', $doc->getNamespaces()['']);
+                $namespaces = $doc->getNamespaces();
+                $doc->registerXPathNamespace('xhtml', $namespaces['']);
                 $tab = $doc->xpath('xhtml:body//xhtml:table');
                 if (is_array($tab) && !empty($tab)) {
                     $result = $tab[0]->asXML();

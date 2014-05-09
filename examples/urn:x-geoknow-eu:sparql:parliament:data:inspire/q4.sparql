@@ -1,5 +1,8 @@
 PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
 PREFIX au: <http://inspire.jrc.ec.europa.eu/schemas/au/3.0/>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+
 SELECT ?sName
 WHERE { 
 ?f au:nationalCode "9126" .

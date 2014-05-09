@@ -1,5 +1,9 @@
 PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
 PREFIX ps: <http://inspire.jrc.ec.europa.eu/schemas/ps/3.0/>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>
+PREFIX sf: <http://www.opengis.net/ont/sf#>
 SELECT ?fName ?dist
 WHERE {
 ?f ps:siteName ?p .
@@ -9,7 +13,7 @@ WHERE {
 ?spt gn:text ?fName .
 ?f geo:hasGeometry ?fGeom .
 ?fGeom geo:asWKT ?fWKT .
-BIND (geof:distance(?fWKT, "<http://www.opengis.net/def/crs/EPSG/0/4326> POINT (37.975598 23.735933)"^^sf:wktLiteral, units:metre) AS ?dist) .
+BIND (geof:distance(?fWKT, "<http://www.opengis.net/def/crs/EPSG/0/4326> POINT (37.975598 23.735933)"^^sf:wktLiteral, uom:metre) AS ?dist) .
 FILTER (?dist < 20000)
 }
 ORDER BY ?dist

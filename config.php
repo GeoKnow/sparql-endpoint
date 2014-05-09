@@ -296,7 +296,27 @@ $config['graphs']['urn:x-geoknow-eu:sparql:csw-middleware'] = array(
     'examples' => array(
         'q0' => array(
             'file' => 'q0.sparql',
-            'description' => 'Find records tagged as related to "water"',
+            'description' => 'Find records tagged with a given keyword',
+        ),
+        'q1' => array(
+            'file' => 'q1.sparql',
+            'description' => 'Find datasets that specify the given subject in their metadata',
+        ),
+        'q2' => array(
+            'file' => 'q2.sparql',
+            'description' => 'Find datasets with spatial coverage inside a given rectangle (BBOX)',
+        ),
+        'q3' => array(
+            'file' => 'q3.sparql',
+            'description' => 'Identify datasets that specify the given title and subject',
+        ),
+        'q4' => array(
+            'file' => 'q4.sparql',
+            'description' => 'Find datasets within a given rectangle (BBOX), with also a keyword and a title',
+        ),
+        'q5' => array(
+            'file' => 'q5.sparql',
+            'description' => 'Find datasets on multiple subjects',
         ),
     ),
 );

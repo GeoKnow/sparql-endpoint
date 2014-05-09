@@ -20,4 +20,5 @@ WHERE {
 ?fGeom geo:asWKT ?fWKT .
 FILTER (bif:st_intersects(bif:st_get_bounding_box(?qWKT),bif:st_get_bounding_box(?fWKT)))
 }
-LIMIT 100
+LIMIT 50
+

@@ -1,5 +1,10 @@
-iPREFIX ad:<http://inspire.jrc.ec.europa.eu/schemas/ad/3.0/> 
+PREFIX ad:<http://inspire.jrc.ec.europa.eu/schemas/ad/3.0/> 
 PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+PREFIX sf: <http://www.opengis.net/ont/sf#>
+PREFIX uom: <http://www.opengis.net/def/uom/OGC/1.0/>
+
 SELECT ?tName ?addNum ?pCode ?dist
 WHERE { 
 ?f ad:locator ?aLoc .   
@@ -19,7 +24,7 @@ WHERE {
 ?addr ad:GeographicPosition ?aPos .
 ?aPos geo:hasGeometry ?fGeom .
 ?fGeom geo:asWKT ?fWKT .
-BIND (geof:distance(?fWKT, "<http://www.opengis.net/def/crs/EPSG/0/4326> POINT (40.582051 22.952149)"^^sf:wktLiteral, units:metre) AS ?dist) .
+BIND (geof:distance(?fWKT, "<http://www.opengis.net/def/crs/EPSG/0/4326> POINT (40.582051 22.952149)"^^sf:wktLiteral, uom:metre) AS ?dist) .
 FILTER (?dist < 2000)
 }
 LIMIT 10

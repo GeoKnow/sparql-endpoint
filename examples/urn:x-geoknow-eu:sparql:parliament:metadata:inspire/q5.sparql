@@ -1,5 +1,8 @@
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX locn: <http://www.w3.org/ns/locn#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+PREFIX sf:<http://www.opengis.net/ont/sf#>
+
 SELECT ?dataURI ?title ?details (geof:envelope(?fWKT) AS ?totalExtent)
 WHERE {
     ?dataURI dct:title ?title .

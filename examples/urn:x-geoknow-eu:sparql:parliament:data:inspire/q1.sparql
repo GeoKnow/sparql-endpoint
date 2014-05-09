@@ -1,5 +1,9 @@
 PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
 PREFIX au: <http://inspire.jrc.ec.europa.eu/schemas/au/3.0/>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+PREFIX geof: <http://www.opengis.net/def/function/geosparql/>
+PREFIX sf: <http://www.opengis.net/ont/sf#>
+
 SELECT ?nCode ?aName
 WHERE {
 ?f au:nationalCode ?nCode .
@@ -12,3 +16,4 @@ WHERE {
 ?fGeom geo:asWKT ?fWKT .
 FILTER (geof:sfContains(?fWKT, "<http://www.opengis.net/def/crs/EPSG/0/4326> POINT (40.582051 22.952149)"^^sf:wktLiteral))
 }
+
