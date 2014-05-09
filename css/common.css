@@ -1,0 +1,111 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,600,700&subset=latin,greek-ext,greek,latin-ext);
+@import url(http://fonts.googleapis.com/css?family=Lato:400,700);
+
+body { 
+    background-color: #fff;
+    margin: 0px;
+    padding: 0px;
+}
+
+label {
+    font-weight: bold;
+}         
+
+/* Override Bootstrap's defaults */
+
+.btn {
+    border-radius: 1px;
+    font-size: inherit;
+}
+
+.btn-link {
+    vertical-align: baseline;
+}
+
+.dropdown-menu {
+    border-radius: 1px;
+    font-size: inherit;
+}
+
+.alert {
+    border-radius: 2px;
+} 
+
+select,
+input[type="text"], 
+input[type="password"] { 
+    padding: 6px 5px;
+}
+
+pre {
+    background-color: #f7f7f7;
+    border-radius:1px;
+    font-size: 0.9em;
+}
+
+select.form-control,
+input.form-control { 
+    font-size: inherit;
+    height: inherit;
+    border-radius:1px;
+}
+
+.form-control:focus { 
+    box-shadow: none;
+} 
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+textarea.form-control { 
+    font-size: inherit;
+    border-radius:1px;
+    padding: 6px 5px;
+}
+
+.panel {
+    border-radius:1px;
+}
+
+.panel-body {
+    padding: 10px;
+}
+
+.panel-heading {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.panel-heading .title {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+/* Custom styling */
+
+#header {
+    height: 65px;
+    min-height: 65px;
+    background: #2b6489;
+    color: #f0f8fe;    
+}
+#header #logo {
+    display: block;
+    position: absolute;
+    width: 600px;
+    margin: 0px 45px;
+} 
+#header #logo > h1 {
+    font-size: 2.4em;
+    margin: 6px 0px 3px 0px;
+    font-family: serif;
+}
+#header #logo > p { 
+    font-size: 0.85em;
+    font-family: caption, sans-serif;
+    margin: 0px 0px 10px 0px;
+}
+#main-content {
+}
+

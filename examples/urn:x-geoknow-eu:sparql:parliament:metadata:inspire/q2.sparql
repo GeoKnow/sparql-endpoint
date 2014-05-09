@@ -1,0 +1,13 @@
+PREFIX dct: <http://purl.org/dc/terms/>
+SELECT ?dataURI ?title (MAX(?date) AS ?lastModified)
+WHERE {
+   { ?dataURI dct:title ?title . 
+     ?dataURI dct:created ?date } 
+   UNION 
+   { ?dataURI dct:title ?title . 
+     ?dataURI dct:modified ?date }
+   FILTER  ( ?date >= "2011-01-01"^^xsd:date )
+}
+GROUP BY ?dataURI ?title
+ORDER BY ASC(?lastModified)
+

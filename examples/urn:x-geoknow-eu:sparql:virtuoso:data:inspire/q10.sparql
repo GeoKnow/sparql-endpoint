@@ -1,0 +1,28 @@
+PREFIX ad:<http://inspire.jrc.ec.europa.eu/schemas/ad/3.0/> 
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+SELECT ?tName ?addNum ?pCode ?dist
+WHERE { 
+?f ad:locator ?aLoc . 
+?aLoc ad:AddressLocator ?addDes .
+?addDes ad:designator ?aDes .
+?aDes ad:LocatorDesignator ?aLocDes .
+?aLocDes ad:designator ?addNum . 
+?f ad:component ?cp .
+?cp ad:postCode ?pCode .
+?f ad:component ?c .
+?c ad:name ?t .
+?t gn:GeographicalName ?rnName .
+?rnName gn:spelling ?rspn .
+?rspn gn:SpellingOfName ?rspt .
+?rspt gn:text ?tName .
+?f ad:position ?addr .
+?addr ad:GeographicPosition ?aPos .
+?aPos geo:hasGeometry ?fGeom .
+?fGeom geo:asWKT ?fWKT .
+BIND (bif:st_distance(?fWKT, bif:st_point (22.952149, 40.582051)) AS ?dist) .
+FILTER (?dist < 2) 
+}
+ORDER BY ?dist
+LIMIT 10
+

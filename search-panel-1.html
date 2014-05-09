@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <title>SPARQL Query Editor - Test 1</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.9.1.js"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        #main-container {
+            font-size: 13px;
+            font-family: sans-serif;
+        }
+        .row > div {
+            margin-top:12px;
+        }
+        #query-form {
+            margin: 0px 30px;
+        }
+        #input-default_graph_uri {
+            /*width: 500px;*/
+        }
+        #input-query {
+            /*width: 500px;*/
+        }
+        #input-result_format {
+            width: 300px;
+        }
+        #input-example_query {
+            width: 300px;
+        }
+        #input-example_query + #input-load_example_query {
+            margin-left: 8px;
+        }
+    </style>
+
+<body>
+<div id="main-container" class="container-fluid">
+
+    <div id="header" class="row">
+        <div id="logo">
+            <h1>SPARQL Query Editor</h1>
+            <p>geoknow-server.imis.athena-innovation.gr</p>
+        </div>
+    </div>
+    
+    <div id="main-content" class="row">
+          
+         <div class="col-xs-6"><form id="query-form">
+            <div id="default_graph_uri-form-group" class="form-group">   
+                <label for="input-default_graph_uri">Default graph URI: </label>
+                <input id="input-default_graph_uri" class="form-control" type="text" autocomplete="on" 
+                    name="input-default_graph_uri" value="http://localhost:8890/geodata/inspire"
+                    data-default-value="http://localhost:8890/geodata/inspire"
+                />
+            </div>
+            <div id="query-form-group" class="form-group">
+                <label for="input-query">Enter SPARQL query: </label>
+                <textarea id="input-query" class="form-control" name="query" 
+                    placeholder="Paste here your SPARQL query" rows="10"
+                    ></textarea>
+            </div>
+            <div id="result_format-form-group" class="form-group"> 
+                <label for="input-example_query">Pick an example: </label>
+                <div class="input-group">
+                    <select id="input-example_query" class="form-control" name="example_query">
+                        <option value="1">Q1 - Spatial containment</option>
+                        <option value="2">Q2 - Distance</option>
+                        <option value="3">Q3 - String pattern matching</option>
+                    </select>
+                    <button id="input-load_example_query" class="btn btn-default" type="button">Load it!</button>
+                </div>
+            </div>
+            <div id="result_format-form-group" class="form-group">
+                <label for="input-result_format">Result format: </label>
+                <select id="input-result_format" class="form-control" name="result_format" data-default-value="text/html">
+                    <option value="application/json">JSON</option>
+                    <option value="text/html">HTML</option>
+                    <option value="text/csv">CSV</option>
+                    <option value="application/vnd.ms-excel">Excel Spreadsheet</option>
+                    <option value="application/xml">XML</option>
+                    <option value="application/javascript">Javascript</option>
+                    <option value="text/plain">NTriples</option>
+                    <option value="application/rdf+xml">RDF/XML</option>
+                    <option value="text/tab-separated-values">TSV</option>
+                </select>
+            </div>
+            <div>
+                <button id="input-reset" class="btn btn-default">Reset</button>
+                <button id="input-submit" class="btn btn-primary">Submit</button>
+                <!--
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Preview results</a></li>
+                        <li><a href="#">Download results</a></li>
+                    </ul>
+                </div>
+                -->
+            </div>
+        </form></div>
+ 
+        <!--
+        <div class="col-md-5"><div class="panel panel-default">
+            <div class="panel-heading">Query Pane</div>
+            <div class="panel-body">
+              Blah Blah
+            </div>
+        </div></div>
+        -->
+
+        <div class="col-xs-6"><div class="panel panel-default">
+            <div class="panel-heading">Preview Pane</div>
+            <div class="panel-body">
+              Nothing (yet)
+            </div>
+        </div></div>
+     
+    </div>
+    
+    <div id="footer" class="row">
+    </div>
+</div>
+</body>
+
+<script type="text/javascript">
+var api_url = 'api-proxy.php'
+
+function resetParams()
+{
+   $("#input-query").val('');
+   $("#input-result_format").val('text/html');
+
+   return
+}
+
+function submitQuery()
+{        
+    var $graph_uri = $("#input-default_graph_uri")
+    var graph_uri = $graph_uri.val()
+    if (graph_uri.length == 0) {
+        graph_uri = $graph_uri.data("default-value")
+    }
+        
+    var $query = $("#input-query")
+    var query = $query.val()
+    if (query.length == 0) {
+        alert('Empty query')
+        return;
+    }
+    
+    var $result_format = $("#input-result_format")
+    var result_format = $result_format.val()
+    if (result_format.length == 0) {
+        result_format = $result_format.data('default-value')
+    }
+
+    $.ajax({
+        url: api_url,
+        data: {
+            'default_graph_uri': graph_uri,
+            'format': result_format,
+            'query': query,
+        },
+        dataType: 'json',
+    })
+    .done(function (data, status_text, jqxhr) {
+        console.info('Success!')
+    })
+    .fail(function (jqxhr, status_text) { 
+        console.error('Failed! status=' + status_text)
+    })
+    
+    return
+}
+
+function loadExampleQuery()
+{
+    var example_num = parseInt($("#input-example_query").val())
+    var resource_url = "examples/" + example_num + ".sparql"
+    $.get(resource_url)
+    .done(function (data) {
+        $('#input-query').val(data)
+    })
+    .fail(function() {
+        console.error('Failed to load resource: ' + resource_url)
+    })
+}
+
+$(document).ready(function () 
+{ 
+    $("#input-submit").click(function (ev) {
+        submitQuery()
+        return false;
+    });
+    $("#input-reset").click(function (ev) {
+        resetParams()
+        return false;
+    });
+    $("#input-load_example_query").click(function (ev) {
+        loadExampleQuery()
+        return false;
+    });
+});
+</script>
+

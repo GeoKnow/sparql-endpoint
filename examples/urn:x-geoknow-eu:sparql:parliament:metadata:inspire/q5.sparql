@@ -1,0 +1,11 @@
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX locn: <http://www.w3.org/ns/locn#>
+SELECT ?dataURI ?title ?details (geof:envelope(?fWKT) AS ?totalExtent)
+WHERE {
+    ?dataURI dct:title ?title .
+    ?dataURI dct:description ?details .
+    ?dataURI dct:spatial ?extent .
+    ?extent locn:geometry ?fWKT .
+    FILTER (geof:sfIntersects ("POLYGON((21.46 37.96, 22.73 37.96, 22.73 39.11, 21.46 39.11, 21.46 37.96))"^^sf:wktLiteral, geof:envelope(?fWKT) ))
+}
+

@@ -1,0 +1,11 @@
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+SELECT ?dataURI ?title ?details ?key ?subject ?homeURL
+WHERE {
+   ?dataURI dct:title ?title .
+   ?dataURI dct:subject ?subject .
+   ?dataURI dct:description ?details .
+   ?dataURI dcat:landingPage ?homeURL .
+   ?dataURI dcat:keyword ?key .
+   FILTER (REGEX(?key, "^Καλαμαριά*", "i"))
+}

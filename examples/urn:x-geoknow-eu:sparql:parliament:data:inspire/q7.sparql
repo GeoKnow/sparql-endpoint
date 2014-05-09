@@ -1,0 +1,12 @@
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX hy-n: <http://inspire.jrc.ec.europa.eu/schemas/hy-n/3.0/>
+SELECT ?riverName ?len
+WHERE { 
+?q hy-n:geographicalName ?r .
+?r gn:GeographicalName ?rnName .
+?rnName gn:spelling ?rspn .
+?rspn gn:SpellingOfName ?rspt .
+?rspt gn:text ?riverName .
+?q hy-n:length ?len .
+FILTER ( xsd:decimal(?len) > 30000)
+}

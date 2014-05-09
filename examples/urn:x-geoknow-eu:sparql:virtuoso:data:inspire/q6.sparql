@@ -1,0 +1,15 @@
+PREFIX tn: <http://inspire.jrc.ec.europa.eu/schemas/tn/3.0/>
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+SELECT DISTINCT((?roName) AS ?roadName)
+WHERE {
+?r geo:hasGeometry ?rGeom .
+?rGeom geo:asWKT ?rWKT .
+?r tn:geographicalName ?p .
+?p gn:GeographicalName ?rdName .
+?rdName gn:spelling ?rpn .
+?rpn gn:SpellingOfName ?rpt .
+?rpt gn:text ?roName .
+}
+ORDER BY ?roadName
+LIMIT 10

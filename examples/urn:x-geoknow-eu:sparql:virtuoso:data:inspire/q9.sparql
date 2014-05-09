@@ -1,0 +1,20 @@
+PREFIX ad:<http://inspire.jrc.ec.europa.eu/schemas/ad/3.0/> 
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX geo:<http://www.opengis.net/ont/geosparql#>
+SELECT ?sName ?addNum ?pCode 
+WHERE { 
+?f ad:locator ?aLoc .   
+?aLoc ad:AddressLocator ?addDes .
+?addDes ad:designator ?aDes .
+?aDes ad:LocatorDesignator ?aLocDes .
+?aLocDes ad:designator ?addNum .    
+?f ad:component ?cp .
+?cp ad:postCode ?pCode .            
+?f ad:component ?t .                
+?t ad:name ?thName .
+?thName gn:GeographicalName ?rnName .
+?rnName gn:spelling ?rspn .
+?rspn gn:SpellingOfName ?rspt .
+?rspt gn:text "ΠΟΝΤΟΥ"@el .         
+?rspt gn:text ?sName
+}

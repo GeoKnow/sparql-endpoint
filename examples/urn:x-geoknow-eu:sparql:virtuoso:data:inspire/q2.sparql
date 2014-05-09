@@ -1,0 +1,16 @@
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX ps: <http://inspire.jrc.ec.europa.eu/schemas/ps/3.0/>
+PREFIX geo:<http://www.opengis.net/ont/geosparql#>
+SELECT ?fName ?dist_km
+WHERE {
+?f ps:siteName ?p .
+?p gn:GeographicalName ?gnName .
+?gnName gn:spelling ?spn .
+?spn gn:SpellingOfName ?spt .
+?spt gn:text ?fName .
+?f geo:hasGeometry ?fGeom .
+?fGeom geo:asWKT ?fWKT .
+BIND (bif:st_distance(bif:st_point(23.735933, 37.975598), bif:st_point( (bif:st_xmin(?fWKT)+bif:st_xmax(?fWKT))/2.0 , (bif:st_ymin(?fWKT)+bif:st_ymax(?fWKT))/2.0) ) AS ?dist_km) .
+FILTER (?dist_km < 20)
+}
+ORDER BY ?dist_km

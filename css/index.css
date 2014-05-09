@@ -1,0 +1,96 @@
+@import url('common.css');
+
+#top-container {
+    background: #fff;
+    font-size: 13px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.row > .pane {
+    margin-top:12px;
+}
+
+.panel { 
+    min-height: 500px;
+}
+
+#query-form {
+    margin: 0px 2px;
+}
+
+#input-result_format {
+    width: 400px;
+}
+
+#input-example_query {
+    width: 400px;
+}
+
+#input-example_query + #input-load_example_query {
+    margin-left: 8px;
+}
+
+#query-pane, 
+#results-pane {
+    margin-top: 5px;
+    padding-left: 5px;
+    padding-right: 0px;
+}
+#results-pane {
+    padding-right: 5px;
+} 
+
+#results-body { 
+    position: relative;
+    margin: 0px 0px; 
+    height: 490px;
+ }
+
+#results-body pre.prettyprint {
+    font-size: 0.85em;
+    border: solid 1px #ccc;
+    padding: 8px 5px;
+    overflow: scroll;
+    height: 100%;
+}
+
+#download-iframe {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    top: 0px;
+    left: 0px;
+    z-index: -1000;
+    background: #f1d7d7;
+}
+
+/* Override CodeMirror's defaults */
+
+.CodeMirror { 
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.3em;
+    outline: none; 
+    border: 1px solid #ccc; 
+}
+
+.CodeMirror-focused { 
+}
+
+.CodeMirror pre.CodeMirror-placeholder { 
+    color: #999; 
+}
+
+#query-editor .CodeMirror {
+    height: 240px;
+}
+
+#query-editor .CodeMirror.CodeMirror-focused {
+    outline: none; 
+    border: solid 1px #66afe9; 
+}
+
+#results-body .CodeMirror {
+    height: 465px;
+}
+

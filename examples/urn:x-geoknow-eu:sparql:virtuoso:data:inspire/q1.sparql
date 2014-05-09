@@ -1,0 +1,16 @@
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX au: <http://inspire.jrc.ec.europa.eu/schemas/au/3.0/>
+PREFIX geo:<http://www.opengis.net/ont/geosparql#>
+SELECT ?nCode ?aName
+WHERE {
+  ?f au:nationalCode ?nCode .
+  ?f au:name ?a .
+  ?a gn:GeographicalName ?gnName .
+  ?gnName gn:spelling ?spn .
+  ?spn gn:SpellingOfName ?spt .
+  ?spt gn:text ?aName .
+  ?f geo:hasGeometry ?fGeom .
+  ?fGeom geo:asWKT ?fWKT .
+  FILTER (bif:st_contains (?fWKT, bif:st_point (22.952149, 40.582051)))
+}
+

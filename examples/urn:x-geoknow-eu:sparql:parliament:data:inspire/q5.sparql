@@ -1,0 +1,8 @@
+PREFIX cp: <http://inspire.jrc.ec.europa.eu/schemas/cp/3.0/>
+SELECT ?pCode ?area
+WHERE {
+?f cp:label ?pCode .
+?f cp:areaValue ?area .
+FILTER ( ?area > 20000)
+}
+ORDER BY ?area

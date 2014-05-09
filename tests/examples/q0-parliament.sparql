@@ -1,0 +1,7 @@
+SELECT ?s ?p
+WHERE { 
+  GRAPH <urn:x-geoknow-eu:sparql:parliament:metadata:inspire> { 
+    ?s ?p ?o 
+  }
+}
+LIMIT 3

@@ -1,0 +1,21 @@
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX au: <http://inspire.jrc.ec.europa.eu/schemas/au/3.0/> 
+PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+SELECT ?sName
+WHERE { 
+?f au:name ?a .
+?a gn:GeographicalName ?gnName .
+?gnName gn:spelling ?spn .
+?spn gn:SpellingOfName ?spt .
+?spt gn:text "Ρόδου"@el .
+?f geo:hasGeometry ?fGeom .
+?fGeom geo:asWKT ?fWKT .
+?s gn:name ?p .
+?p gn:GeographicalName ?stName .
+?stName gn:spelling ?stn .
+?stn gn:SpellingOfName ?sptn .
+?sptn gn:text ?sName .
+?s geo:hasGeometry ?sGeom .
+?sGeom geo:asWKT ?sWKT .
+FILTER (bif:st_within(bif:st_point( (bif:st_xmin(?sWKT)+bif:st_xmax(?sWKT))/2.0 , (bif:st_ymin(?sWKT)+bif:st_ymax(?sWKT))/2.0), bif:st_get_bounding_box(?fWKT)))
+}

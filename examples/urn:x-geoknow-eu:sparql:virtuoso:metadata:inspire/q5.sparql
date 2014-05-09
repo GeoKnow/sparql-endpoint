@@ -1,0 +1,10 @@
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX locn: <http://www.w3.org/ns/locn#>
+SELECT ?dataURI ?title ?details (bif:st_get_bounding_box(?fWKT) AS ?totalExtent)
+WHERE {
+    ?dataURI dct:title ?title .
+    ?dataURI dct:description ?details .
+    ?dataURI dct:spatial ?extent .
+    ?extent locn:geometry ?fWKT .
+    FILTER (bif:st_intersects ("BOX2D(21.46 37.96,22.73 39.11)"^^virtrdf:Geometry, bif:st_get_bounding_box(?fWKT) ))
+}

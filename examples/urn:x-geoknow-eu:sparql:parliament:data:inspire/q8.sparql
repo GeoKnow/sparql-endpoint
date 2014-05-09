@@ -1,0 +1,22 @@
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX hy-n: <http://inspire.jrc.ec.europa.eu/schemas/hy-n/3.0/>
+PREFIX ps: <http://inspire.jrc.ec.europa.eu/schemas/ps/3.0/>
+SELECT ?riverName ?siteName
+WHERE { 
+?q hy-n:geographicalName ?r .
+?r gn:GeographicalName ?rnName .
+?rnName gn:spelling ?rspn .
+?rspn gn:SpellingOfName ?rspt .
+?rspt gn:text ?riverName .
+?q geo:hasGeometry ?qGeom .
+?qGeom geo:asWKT ?qWKT .
+?f ps:siteName ?p .
+?p gn:GeographicalName ?gnName .
+?gnName gn:spelling ?spn .
+?spn gn:SpellingOfName ?spt .
+?spt gn:text ?siteName .
+?f geo:hasGeometry ?fGeom .
+?fGeom geo:asWKT ?fWKT .
+FILTER (geof:sfIntersects(?fWKT, ?qWKT))
+}
+LIMIT 10

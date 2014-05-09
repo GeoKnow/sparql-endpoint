@@ -1,0 +1,18 @@
+PREFIX gn: <http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/>
+PREFIX au: <http://inspire.jrc.ec.europa.eu/schemas/au/3.0/>
+SELECT ?sName
+WHERE { 
+?f au:nationalCode "9126" .
+?f geo:hasGeometry ?fGeom .
+?fGeom geo:asWKT ?fWKT .
+?s gn:name ?p .
+?s geo:hasGeometry ?sGeom .
+?sGeom geo:asWKT ?sWKT .
+?p gn:GeographicalName ?stName .
+?stName gn:spelling ?stn .
+?stn gn:SpellingOfName ?sptn .
+?sptn gn:text ?sName .
+FILTER (geof:sfWithin(?sWKT,?fWKT))
+}
+ORDER BY ?sName
+
