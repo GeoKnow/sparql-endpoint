@@ -478,6 +478,7 @@ geoknow.QueryFormView = Backbone.View.extend({
     handleDownload: function(ev)
     {  
         if (this.model.isValid()) {
+            this.model.set('result', null); /* as of issue #3 */
             var $form = this.$el.find('form');
             $form.find('#input-op').val('download');
             $form.submit();
