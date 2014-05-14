@@ -477,11 +477,13 @@ geoknow.QueryFormView = Backbone.View.extend({
 
     handleDownload: function(ev)
     {  
-        var $form = this.$el.find('form');
-
-        $form.find('#input-op').val('download');
-        
-        $form.submit();
+        if (this.model.isValid()) {
+            var $form = this.$el.find('form');
+            $form.find('#input-op').val('download');
+            $form.submit();
+        } else {
+            alert ('The query is invalid (' + this.model.validationError + ')');
+        }
 
         return false;
     },
