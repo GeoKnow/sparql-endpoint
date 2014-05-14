@@ -350,7 +350,7 @@ geoknow.QueryFormView = Backbone.View.extend({
         return;
     },
 
-    _renderForm: function()
+    _renderForm: function(ev)
     {
         var cls = this.constructor
         var m = this.model
@@ -366,17 +366,9 @@ geoknow.QueryFormView = Backbone.View.extend({
         this.$el.find('#input-graph_uri').val(uri);
         this.$el.find('#input-query').val(query);
         
-        this._populateSelect('input-example_query', _(graph_config.examples).map(function(v) {
-            return { 
-                value: 'examples/' + uri + '/' + v.file, 
-                description: v.description 
-            };
-        }));
-
         this._populateSelect('input-result_format', _(cls.config.resultFormats).filter(function(v) {
             return !(graph_config.resultFormats.indexOf(v.value) < 0); 
         }));
-      
         this.$el.find('#input-result_format').val(format);
         
         // Fill SPARQL code editor
@@ -392,7 +384,18 @@ geoknow.QueryFormView = Backbone.View.extend({
         
         var $btn = this.$el.find('#input-submit-preview');
         $btn.attr('disabled', (spec.preview)? (null):('disabled'));         
+       
+        // Populate examples (at 1st time or when graph-uri has changed) 
         
+        if (_(ev).isUndefined() || ('graphUri' in (m.changedAttributes() || {}))) {
+            this._populateSelect('input-example_query', _(graph_config.examples).map(function(v) {
+                return { 
+                    value: 'examples/' + uri + '/' + v.file, 
+                    description: v.description 
+                };
+            }));
+        }
+
         return;
     },
 

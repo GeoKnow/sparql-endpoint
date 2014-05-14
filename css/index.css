@@ -19,11 +19,11 @@
 }
 
 #input-result_format {
-    width: 400px;
+    width: 440px;
 }
 
 #input-example_query {
-    width: 400px;
+    width: 440px;
 }
 
 #input-example_query + #input-load_example_query {
