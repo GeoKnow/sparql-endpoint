@@ -29,18 +29,13 @@
     <script src="js/geoknow/query-editor.js"></script>
 
     <link rel="stylesheet" href="css/index.css" />
-  
+
   </head>
   
   <body>
   <div id="top-container" class="container-fluid">
     
-    <div id="header" class="row">
-      <div id="logo">
-        <h1>SPARQL Query Editor</h1>
-        <p>geoknow-server.imis.athena-innovation.gr</p>
-      </div>
-    </div>
+    <div id="header" class="row"></div>
 
     <div id="main-content" class="row">
 
@@ -158,6 +153,36 @@
 </html>
 
 <script type="text/javascript">
+
+// Setup theme-specific parts (stylesheets, page headers)
+
+$(document).ready(function () {
+    
+    var THEME_NAME = 'geodata'
+    
+    $('body').addClass('theme-' + THEME_NAME)
+
+    var $link = $('<link>')
+        .attr('rel', 'stylesheet')
+        .attr('href', 'css/themes/' + THEME_NAME + '/style.css')
+    $('head').append($link)
+
+    var header_tpl = 'templates/themes/' + THEME_NAME + '/header.html'
+    $.get(header_tpl)
+        .done(function (data) {
+            var header = _.template(data)({ 
+                title: 'SPARQL Query Editor',
+                headerLine: 'geoknow-server.imis.athena-innovation.gr',
+            }) 
+            $('#header').append($(header))
+        })
+        .fail(function () {
+            console.error('Failed to load markup for page header')
+        })
+
+})
+
+// Main
 
 $(document).ready(function () {
     

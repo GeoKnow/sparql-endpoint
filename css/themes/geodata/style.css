@@ -1,0 +1,59 @@
+/* Theme "geodata" */
+
+#header {
+    position: relative;
+    height: 127px;
+}
+
+#header #header-block-l {
+    float: left;
+    padding-left: 5px; 
+}
+
+#header #header-block-r {
+    float: right;
+    padding-right: 5px; 
+}
+
+#header #menu-wrapper {
+    display: block;
+    position: absolute;
+    right: 0px;
+    top: 80%;
+    border: dotted 0px silver;
+}
+
+#header #menu-wrapper ul {
+   font-size: 1.1em; 
+}
+
+#header #menu-wrapper ul li {
+    display: inline-block;
+    padding-right: 8px;
+    color: #71BFD2;
+}
+
+#header #menu-wrapper ul li a {
+    color: #71BFD2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#header #logo {
+    display: block;
+    position: absolute;
+    left: 170px;
+    top: 10px;
+    border: dotted 0px #999;
+}
+
+#header #logo > h1 {
+    font-size: 3em;
+    margin-bottom: 6px;
+}
+
+#header #logo > p {
+    display: block;
+    font-size: 0.95em;
+    color: #888;
+}

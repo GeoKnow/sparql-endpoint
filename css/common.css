@@ -82,30 +82,17 @@ textarea.form-control {
     font-size: 1.1em;
 }
 
-/* Custom styling */
-
 #header {
-    height: 65px;
-    min-height: 65px;
-    background: #2b6489;
-    color: #f0f8fe;    
+    height: 90px;
+    min-height: 90px;
+    background: #fff;
+    color: #555;
 }
+
 #header #logo {
-    display: block;
-    position: absolute;
-    width: 600px;
-    margin: 0px 45px;
-} 
-#header #logo > h1 {
-    font-size: 2.4em;
-    margin: 6px 0px 3px 0px;
-    font-family: serif;
+    margin: 0px 12px;
 }
-#header #logo > p { 
-    font-size: 0.85em;
-    font-family: caption, sans-serif;
-    margin: 0px 0px 10px 0px;
-}
+
 #main-content {
 }
 

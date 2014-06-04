@@ -1,0 +1,28 @@
+/* Theme "default" */
+
+#header {
+    height: 65px;
+    min-height: 65px;
+    background: #2b6489;
+    color: #f0f8fe;
+}
+
+#header #logo {
+    display: block;
+    position: absolute;
+    width: 600px;
+    margin: 0px 45px;
+} 
+
+#header #logo > h1 {
+    font-size: 2.4em;
+    margin: 6px 0px 3px 0px;
+    font-family: serif;
+}
+
+#header #logo > p { 
+    font-size: 0.85em;
+    font-family: caption, sans-serif;
+    margin: 0px 0px 10px 0px;
+}
+
