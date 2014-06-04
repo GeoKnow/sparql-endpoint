@@ -25,7 +25,7 @@ $config['result_formats'] = array(
         'extension' => 'rdf',
     ), 
     'application/sparql-results+xml' => array(
-        'extension' => 'srx',
+        'extension' => 'xml',
     ), 
     'text/tab-separated-values' => array(
         'extension' => 'tsv',
@@ -54,8 +54,8 @@ $config['backends']['virtuoso'] = array(
     'query_class' => 'VirtuosoQuery',
     'api_endpoint' => 'http://geoknow-server.imis.athena-innovation.gr:11480/sparql',
     'result_formats' => array(
-        'application/json' => 'application/json',
         'text/html' => 'text/html',
+        'application/json' => 'application/json',
         'text/csv' => 'text/csv',
         'application/vnd.ms-excel' => 'application/vnd.ms-excel',
         'application/xml' => 'application/xml',
@@ -72,8 +72,8 @@ $config['backends']['parliament'] = array(
     'query_class' => 'ParliamentQuery',
     'api_endpoint' => 'http://geoknow-server.imis.athena-innovation.gr:11880/parliament/sparql',
     'result_formats' => array(
-        'application/json' => 'json',
         'text/html' => 'html',
+        'application/json' => 'json',
         'application/sparql-results+xml' => 'xml',
         'text/csv' => 'csv',
     ),

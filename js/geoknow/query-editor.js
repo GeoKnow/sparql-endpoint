@@ -128,7 +128,7 @@ geoknow.Query = Backbone.Model.extend({
     service: { 
         defaults: {
             graphUri: 'urn:x-geoknow-eu:sparql:virtuoso:metadata:inspire',
-            resultFormat: 'application/json',
+            resultFormat: 'text/html',
         },
         url: 'api-proxy.php',
         configUrl: 'get-config.php',
@@ -532,7 +532,7 @@ geoknow.QueryFormView = Backbone.View.extend({
             { value: 'application/javascript', description: 'Javascript', preview: false, }, 
             { value: 'text/plain', description: 'NTriples', preview: false, }, 
             { value: 'application/rdf+xml', description: 'RDF/XML', preview: false, }, 
-            { value: 'application/sparql-results+xml', description: 'SPARQL Results', preview: false, }, 
+            { value: 'application/sparql-results+xml', description: 'SPARQL Results (XML)', preview: false, }, 
             { value: 'text/tab-separated-values', description: 'TSV', preview: true, }, 
         ],
     },     
