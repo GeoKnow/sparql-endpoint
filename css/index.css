@@ -36,6 +36,11 @@
     padding-left: 5px;
     padding-right: 0px;
 }
+
+#results-container {
+    overflow: auto;
+}
+
 #results-pane {
     padding-right: 5px;
 } 

@@ -538,7 +538,7 @@ geoknow.QueryFormView = Backbone.View.extend({
         resultFormats: [
             { value: 'application/json', description: 'JSON', preview: true, }, 
             { value: 'text/html', description: 'HTML', preview: true, }, 
-            { value: 'text/csv', description: 'CSV', preview: true }, 
+            { value: 'text/csv', description: 'CSV', preview: false }, /* Todo: must be previewable */ 
             { value: 'application/vnd.ms-excel', description: 'Excel Spreadsheet', preview: false, }, 
             { value: 'application/xml', description: 'XML', preview: false, }, 
             { value: 'application/javascript', description: 'Javascript', preview: false, }, 
@@ -709,7 +709,7 @@ geoknow.QueryResultView = Backbone.View.extend({
 
         this.$el.find('#results-pane-heading .summary').html(this.templates.heading({
            count: size_displayed, 
-           countTotal: size, /* Todo: provide the actual result size */
+           countTotal: size, /* Todo: provide the actual result size? (if known) */
         }));
         
         this.$el.find('#results-caption').html(this.templates.caption({
@@ -784,6 +784,9 @@ geoknow.QueryResultView = Backbone.View.extend({
             $a.attr('href', $a.text()); 
         });
 
+        $table.find('td:first-child').parent('tr').slice(size_displayed)
+            .remove()
+        
         this.$el.find("#results-body").append($table);
 
         return;
@@ -832,7 +835,7 @@ geoknow.QueryResultView = Backbone.View.extend({
     // Define class properties/methods
     
     limits: {
-        resultSize: 10, /* how many results are displayed in previews ? */ 
+        resultSize: 12, /* how many results are displayed in previews ? */ 
     },
 });
 
