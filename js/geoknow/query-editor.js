@@ -73,7 +73,7 @@ geoknow.Query = Backbone.Model.extend({
                 'result_format': this.get('resultFormat'),
                 'query': this.get('query'),
             },
-            timeout: 15e3, /* millis */
+            timeout: cls.limits.timeout, /* millis */
         });
         
         jqxhr.done(_.bind(this.handleSuccess, this));
@@ -98,7 +98,19 @@ geoknow.Query = Backbone.Model.extend({
     {
         var metadata = this.get('resultMetadata');
         
-        metadata.errorMessage = jqxhr.responseText;
+        if (jqxhr.responseText) { 
+            // Received a response
+            metadata.errorMessage = jqxhr.responseText;
+        } else {
+            // No response, probably a timeout
+            if (statusText == 'timeout') {
+                var timeout_seconds = this.constructor.limits.timeout / 1e3
+                metadata.errorMessage = 'Timeout was exceeded (' + 
+                    (timeout_seconds).toFixed(0) + ' seconds)';
+            } else {
+                metadata.errorMessage = 'No response'; 
+            }
+        }
 
         this.error('Failed to run query: ' + statusText);
     },
@@ -122,7 +134,7 @@ geoknow.Query = Backbone.Model.extend({
     
     limits: {
         resultSize: 100,
-        timeout: 5,
+        timeout: 20e3, /* millis */
     },
    
     service: { 
