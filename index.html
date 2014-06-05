@@ -171,8 +171,8 @@ $(document).ready(function () {
     $.get(header_tpl)
         .done(function (data) {
             var header = _.template(data)({ 
-                title: 'SPARQL Query Editor',
-                headerLine: 'geoknow-server.imis.athena-innovation.gr',
+                title: '(Geo)SPARQL Query Editor',
+                headerLine: null /*'geoknow-server.imis.athena-innovation.gr'*/,
             }) 
             $('#header').append($(header))
         })
