@@ -1,19 +1,11 @@
 <?php
 
 /**
- *
  * The frontend API endpoint expects (as GET or POST parameters) 
  *   - graph_uri: URI
  *   - result_format: MIME type
  *   - query: SPARQL   
  *   - op: one of {'preview', 'download'}
- *
- * The backend API endpoint expects parameters (as POST or GET parameters): 
- *   - default-graph-uri: URI
- *   - format: MIME type
- *   - query: SPARQL
- *   - timeout: integer
- *
  **/
 
 require_once 'Log.php';
