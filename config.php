@@ -21,6 +21,9 @@ $config['result_formats'] = array(
     'text/plain' => array(
         'extension' => 'txt',
     ),
+    'application/n-triples' => array(
+        'extension' => 'nt',
+    ), 
     'application/rdf+xml' => array(
         'extension' => 'rdf',
     ), 
@@ -59,6 +62,7 @@ $config['backends']['virtuoso'] = array(
         'text/csv' => 'text/csv',
         'application/vnd.ms-excel' => 'application/vnd.ms-excel',
         'application/xml' => 'application/xml',
+        'application/n-triples' => 'text/plain',
         'text/plain' => 'text/plain',
         'application/rdf+xml' => 'application/rdf+xml',
         'text/tab-separated-values' => 'text/tab-separated-values',

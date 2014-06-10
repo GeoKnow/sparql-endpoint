@@ -44,6 +44,35 @@ geoknow.Query = Backbone.Model.extend({
 
         return 0;
     },
+    
+    detectType: function()
+    {
+        var cls = this.constructor;
+        var query = this.get('query');
+
+        // Map this query to one of the basic types listed in cls.queryTypes.
+        // Return undefined if unable to detect it or if no query is supplied (yet).
+ 
+        if (!query) {
+            return undefined;
+        }
+
+        var re_prefix = /PREFIX[\s]*[-a-z]+:[\s]*<[^\s]+>$/mig;
+        
+        //// Todo: parse the whole SELECT/CONSTRUCT clause 
+        //var re_select_clause = /^SELECT[\s]+((DISTINCT|REDUCED)[\s]+)?([\?\$][a-z][_a-z0-9]*)\b/i 
+        //var re_construct_clause = /^CONSTRUCT[\s]+\{[^\{]+\}/i 
+
+        var q = query.replace(re_prefix, "").trim();
+
+        if (q.match(/SELECT\b/i)) {
+            return 'select';
+        } else if (q.match(/CONSTRUCT\b/i)) {
+            return 'construct';
+        }
+
+        return undefined;
+    },
 
     sendQuery: function() 
     {
@@ -132,6 +161,32 @@ geoknow.Query = Backbone.Model.extend({
 }, {
     // Define class properties
     
+    queryTypes: {
+        'select': {
+            value: 'SELECT',
+            description: 'A SELECT query returns a set of rows',
+            allowedFormats: [
+                'application/json', 'text/html', 'text/csv', 'application/vnd.ms-excel',
+                'application/xml', 'text/tab-separated-values',
+            ],
+        },
+        'construct': {
+            value: 'CONSTRUCT',
+            description: 'A CONSTRUCT query returns a set of RDF triples',
+            allowedFormats: [
+                'application/n-triples', 'application/rdf+xml', 'application/sparql-results+xml'
+            ],
+        },
+        'ask': {
+            value: 'ASK',
+            // Not supported //
+        },
+        'describe': {
+            value: 'DESCRIBE',
+            // Not supported //
+        },
+    },
+
     limits: {
         resultSize: 100,
         timeout: 20e3, /* millis */
@@ -146,7 +201,7 @@ geoknow.Query = Backbone.Model.extend({
         configUrl: 'get-config.php',
     },
 
-    config: null,
+    config: null, /* loaded dynamically */
 
     initialize: function()
     {
@@ -366,23 +421,48 @@ geoknow.QueryFormView = Backbone.View.extend({
     {
         var cls = this.constructor
         var m = this.model
-        
+       
+        this.debug('Re-rendering form')
+
         var uri = m.get('graphUri');
         var query = m.get('query');
         var format = m.get('resultFormat');
 
+        // Detect query type, find applicable result formats
+
         var graph_config = m.constructor.config.graphs[uri];
+        var query_type = m.detectType()
+
+        var applicable_formats = null
+        if (query_type) {
+            applicable_formats = _.intersection(
+                graph_config.resultFormats,
+                m.constructor.queryTypes[query_type].allowedFormats    
+            )
+        } else {
+            applicable_formats = graph_config.resultFormats
+        }
+
+        // Sanitize model
         
+        // Note: The current format may not be applicable to the combination (uri, query).
+        // In this case, we change it and silently propagate this change to the model.
+
+        if (applicable_formats.indexOf(format) < 0) {
+            format = _(applicable_formats).first();
+            m.set('resultFormat', format, { silent: true });
+        }   
+
         // Populate basic inputs
-        
+               
         this.$el.find('#input-graph_uri').val(uri);
         this.$el.find('#input-query').val(query);
         
         this._populateSelect('input-result_format', _(cls.config.resultFormats).filter(function(v) {
-            return !(graph_config.resultFormats.indexOf(v.value) < 0); 
+            return !(applicable_formats.indexOf(v.value) < 0)  
         }));
         this.$el.find('#input-result_format').val(format);
-        
+
         // Fill SPARQL code editor
 
         this.editor.setValue(query);
@@ -448,7 +528,7 @@ geoknow.QueryFormView = Backbone.View.extend({
         
         this.model.set('query', val)
 
-        return false;
+        return true;
     },
     
     updateResultFormat: function (ev) 
@@ -457,7 +537,7 @@ geoknow.QueryFormView = Backbone.View.extend({
           
         this.model.set('resultFormat', val)
         
-        return false;
+        return true;
     },
     
     updateGraphUri: function (ev) 
@@ -473,7 +553,7 @@ geoknow.QueryFormView = Backbone.View.extend({
             resultFormat: _(graph_config.resultFormats).first(),
         })
         
-        return false;
+        return true;
     },
 
     handlePreview: function(ev)
@@ -541,11 +621,10 @@ geoknow.QueryFormView = Backbone.View.extend({
             { value: 'text/csv', description: 'CSV', preview: false }, /* Todo: must be previewable */ 
             { value: 'application/vnd.ms-excel', description: 'Excel Spreadsheet', preview: false, }, 
             { value: 'application/xml', description: 'XML', preview: false, }, 
-            { value: 'application/javascript', description: 'Javascript', preview: false, }, 
-            { value: 'text/plain', description: 'NTriples', preview: false, }, 
+            { value: 'application/n-triples', description: 'NTriples', preview: false, }, 
             { value: 'application/rdf+xml', description: 'RDF/XML', preview: false, }, 
             { value: 'application/sparql-results+xml', description: 'SPARQL Results (XML)', preview: false, }, 
-            { value: 'text/tab-separated-values', description: 'TSV', preview: true, }, 
+            { value: 'text/tab-separated-values', description: 'TSV', preview: false, }, /* Todo: same as CSV */ 
         ],
     },     
 });
