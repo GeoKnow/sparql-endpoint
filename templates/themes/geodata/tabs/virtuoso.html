@@ -1,4 +1,4 @@
-﻿<h2>Virtuoso SPARQL endpoint</h2>
+﻿<h3>Virtuoso SPARQL endpoint</h3>
 
 <p>
 We provide direct access to a <a href="http://geoknow-server.imis.athena-innovation.gr:11480/sparql">SPARQL endpoint</a> from our Virtuoso server version 7.1. 
@@ -8,10 +8,10 @@ We provide direct access to a <a href="http://geoknow-server.imis.athena-innovat
 Through this standard Virtuoso interface, you can submit your SPARQL queries using the native Virtuoso SPARQL protocol endpoint and you may access both data and metadata from <a href="http://geodata.gov.gr">http://geodata.gov.gr</a> that are INSPIRE-compliant. The only difference is the <i>Default Data Set Name (graph IRI)</i> that you must specify in your SELECT of CONSTRUCT queries against this native interface:
 
 <br/>
-If you want to:
+If you want to query:
 <ul>
-<li>query <i>INSPIRE metadata</i>, specify <code>urn:x-geoknow-eu:sparql:virtuoso:metadata:inspire </code>as your Graph IRI.</li>
-<li>query <i>INSPIRE data</i>, specify <code>urn:x-geoknow-eu:sparql:virtuoso:data:inspire</code>as your Graph IRI.</li>
+<li>INSPIRE metadata: specify <code>urn:x-geoknow-eu:sparql:virtuoso:metadata:inspire</code>as your Graph IRI.</li>
+<li>INSPIRE data: specify <code>urn:x-geoknow-eu:sparql:virtuoso:data:inspire</code>as your Graph IRI.</li>
 </ul>
 
 Note that you cannot submit any queries against INSPIRE Catalogue Services (CSWs) through this native interface.
@@ -26,10 +26,10 @@ Of course, through our rich, customized Web-based interface at <a href="http://g
 </p>
 
 <p>
-For your convenience we have a set of <a href="/sparql?nsdecl">predefined name space prefixes</a> and <a href="/sparql?rdfinf">inference rules</a>, which can be used in SPARQL queries.
+For your convenience we have a set of <a href="http://geoknow-server.imis.athena-innovation.gr:11480/sparql?nsdecl">predefined name space prefixes</a> and <a href="http://geoknow-server.imis.athena-innovation.gr:11480/sparql?rdfinf">inference rules</a>, which can be used in SPARQL queries.
 </p>
 
-<h2>A note on GeoSPARQL support in Virtuoso</h2>
+<h3>A note on GeoSPARQL support in Virtuoso</h3>
 
 <p>
 <a href="http://www.opengeospatial.org/standards/geosparql">GeoSPARQL</a> is a recent (2012) OGC standard that suggests a unified approach for representing linked geospatial data as RDF triples and querying them through a SPARQL extension equipped with a variety of spatial operators and functions. Virtuoso is very robust and highly scalable, and has recently (version 7.1, spring 2014) included support for storing several spatial data types (points, linestring, polygons, etc.) in the RDF repository. However, it is <i>not GeoSPARQL-compliant yet</i> and has limited support for geometric processing. For example, testing containment of a point in a polygon is evaluated against the minimum bounding box of the polygon and not against the exact geometry. This functionality will be extended in future releases of the software. </br>

@@ -75,6 +75,10 @@
     margin: 20px 0px;
 }
 
+#top-container > .tab-pane > .tab h3 {
+    margin: 15px 0px;
+}
+
 #top-container > .tab-pane > .tab p {
     line-height: 1.5em;
     margin: 10px 200px 10px 0px;
@@ -82,13 +86,15 @@
 
 #top-container > .tab-pane > .tab > pre,
 #top-container > .tab-pane > .tab > .code {
-    margin: 10px 200px 10px 0px;
+    margin: 10px 250px 10px 0px;
+}
+#top-container > .tab-pane > .tab > .code {
 }
 
 #top-container > .tab-pane > .tab > .code {
     position: relative;
 }
 #top-container > .tab-pane > .tab > .code .CodeMirror {
-    height: 200px;
+    height: 220px;
 }
 

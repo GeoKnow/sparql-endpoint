@@ -1,7 +1,7 @@
-﻿<h2>Frequently Asked Questions</h2>
+﻿<h3>Frequently Asked Questions</h3>
 
 <p>
-<b><i> Q: You mention both "Linked Data" and "RDF". Is there any difference? </i></b> <br>
+<b><i>Q: You mention both "Linked Data" and "RDF". Is there any difference? </i></b> <br>
 <b><i>A:</i></b> 
 Linked data is data which contains links to other data. This term refers to a generic approach of publishing structured data so that it can be interlinked and queried along with other data from other sources in the Web. These web resources use Uniform Resource Identifiers (URI), which are resolvable in order to discover more facts. <a href="http://www.w3.org/DesignIssues/LinkedData.html">Find out more...</a>
 <br>
@@ -14,19 +14,19 @@ Almost all Linked Data is currently expressed in RDF, but you may also find link
 
 
 <p>
-<b><i> Q: What is SPARQL? </i></b> <br>
+<b><i>Q: What is SPARQL? </i></b> <br>
 <b><i>A:</i></b> The SPARQL Protocol and RDF Query Language is a query language that can be used to retrieve and manipulate data stored in RDF format. Since the underlying database is a set of "subject-predicate-object" triples, SPARQL allows for a query to consist of triple patterns, conjunctions, disjunctions, and optional patterns. SPARQL 1.0 became an official W3C Recommendation in 2008, whereas SPARQL 1.1 has been adopted in March 2013.
  <a href="http://www.w3.org/TR/sparql11-overview/">Find out more...</a>
 <p>
 
 <p>
-<b><i> Q: A triple store is like a database? </i></b> <br>
+<b><i>Q: A triple store is like a database? </i></b> <br>
 <b><i>A:</i></b> A triple store (or RDF store) is a special type of database for the storage and retrieval of triples. However, the data is modeled by a graph, and each triple is composed of a <i>Subject</i>, a <i>Predicate</i>, and an <i>Object</i>, e.g., "John is brother of Peter" or "Peter is married to Mary". Much like a relational database, information can be loaded into a triple store and then retrieved through queries expressed in SPARQL. In contrast, a key advantage of many triple stores is their ability of reasoning, i.e., inferencing new knowledge from existing triples (e.g., that John is Mary's brother-in-law). Native triplestores (like <a href="http://franz.com/agraph/allegrograph/">AllegroGraph</a>, <a href="http://jena.apache.org/documentation/tdb/">Apache Jena TDB</a>, <a href="http://www.openrdf.org/">Sesame</a>, <a href="http://www.ontotext.com/owlim">OWLIM</a>, etc.) are implemented from scratch and are based on the RDF data model to efficiently store and access the triples. Other triple stores (like <a href="http://www.oracle.com/technology/products/spatial/">Oracle Spatial and Graph</a> or <a href="http://virtuoso.openlinksw.com/">Virtuoso</a>) use an existing RDBMS as their backend by leveraging its powerful capabilities for concurrency, security, recovery, and scalability. Recently, some triple stores have begun to support geospatial RDF data and queries. <a href="http://svn.aksw.org/projects/GeoKnow/Public/D2.1.1_Market_and_Research_Overview.pdf">Find out more on geospatial RDF stores...</a>
 <p>
 
 
 <p>
-<b><i> Q: Why is it important to expose geospatial features as Linked Data? </i></b> <br>
+<b><i>Q: Why is it important to expose geospatial features as Linked Data? </i></b> <br>
 <b><i>A:</i></b> Linked data technologies can provide the means for semantic manipulation of spatial entities, including interlinking, querying, reasoning, aggregation, fusion, and visualisation. However, only a small amount of such information has been published as <i>linked geospatial data</i> and associated with other resources in the Semantic Web. A major difficulty has to do with the inherent complexity of geospatial concepts. Apart from points, which can be simply abstracted as a pair of latitude/longitude coordinates, all other geometries require more robust representations to cope with irregular shapes (e.g., polygons with holes, or curves with multiple disconnected parts). It is also difficult to to provide an answer to a query like "Find all subway stations within 1 km distance from my hotel" when data is represented by web resources, since such implicit topological relationships cannot be trivially expressed and evaluated against features not physically stored in a database. Among the objectives of the GeoKnow project, is to bring geospatial knowledge integration to the Linked Data Web, build scalable technology infrastructure for geospatial exploration and reasoning, and offer qualitative interlinking and fusion of geospatial and semantic information. <a href="http://geoknow.eu/">Find out more...</a>
 <p>
 
@@ -38,7 +38,7 @@ Almost all Linked Data is currently expressed in RDF, but you may also find link
 
 
 <p>
-<b><i> Q: What is the purpose of INSPIRE Directive by the European Commission? </i></b> <br>
+<b><i>Q: What is the purpose of INSPIRE Directive by the European Commission? </i></b> <br>
 <b><i>A:</i></b> In the European Union, the INSPIRE Directive 2007/2/EC standardizes Spatial Data Infrastructures (SDIs) across member states, on a legislative, institutional and technical level. INSPIRE (<i>INfrastructure for SPatial InfoRmation in Europe</i>) will enable the discovery, download, and visualization of geospatial information across the EU in a common, cross-boundary manner. Several member states already offer INSPIRE-compliant metadata, data, and services. According to the INSPIRE roadmap, harmonization and full compliance of all metadata, data and services, is built on specific deadlines and milestones. A pan-European SDI is slowly formed based on member state SDIs. By 2020, every aspect of geospatial information will be available through the INSPIRE network of services, following specific standards for geospatial information. <a href="http://inspire.ec.europa.eu/">Find out more...</a>
 <p>
 
@@ -46,7 +46,7 @@ Almost all Linked Data is currently expressed in RDF, but you may also find link
 
 
 <p>
-<b><i> Q: What is a Catalogue service (CSW) for geospatial data? </i></b> <br>
+<b><i>Q: What is a Catalogue service (CSW) for geospatial data? </i></b> <br>
 <b><i>A:</i></b> Catalogue services support the ability to publish and search collections of descriptive information (metadata) for data, services, and related information objects. Metadata in catalogues represent resource characteristics that can be queried and presented for evaluation and further processing by both humans and software. Open Geospatial Consortium (OGC) Catalogue interface standards specify the interfaces, bindings, and a framework for defining application profiles. <a href="http://www.opengeospatial.org/standards/cat">Find out more...</a>
 <p>
 
