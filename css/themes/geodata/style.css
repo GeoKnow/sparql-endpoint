@@ -67,7 +67,8 @@
     padding: 5px 15px;
 }
 
-#top-container > .tab-pane > .tab p {
+#top-container > .tab-pane > .tab p,
+#top-container > .tab-pane > .tab pre {
     line-height: 1.5em;
     margin: 10px 200px 10px 0px;
 }
