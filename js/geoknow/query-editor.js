@@ -70,6 +70,31 @@ geoknow.Query = Backbone.Model.extend({
         return undefined;
     },
 
+    getApplicableFormats: function()
+    {
+        // Find all applicable result formats for current (graph-uri, query)
+        // Note that current format may not belong to them, i.e. it will be
+        // considered invalid.
+       
+        var cls = this.constructor;
+        var uri = this.get('graphUri')
+        
+        var t = this.detectType();
+
+        var applicable_formats = null;
+       
+        if (t) {
+            applicable_formats = _.intersection(
+                cls.config.graphs[uri].resultFormats,
+                cls.queryTypes[t].allowedFormats    
+            )
+        } else {
+            applicable_formats = cls.config.graphs[uri].resultFormats
+        }
+
+        return applicable_formats;
+    },
+
     sendQuery: function() 
     {
         var cls = this.constructor
@@ -419,33 +444,21 @@ geoknow.QueryFormView = Backbone.View.extend({
         var uri = m.get('graphUri');
         var query = m.get('query');
         var format = m.get('resultFormat');
-
-        // Detect query type, find applicable result formats
-
         var graph_config = m.constructor.config.graphs[uri];
-        var query_type = m.detectType()
 
-        var applicable_formats = null
-        if (query_type) {
-            applicable_formats = _.intersection(
-                graph_config.resultFormats,
-                m.constructor.queryTypes[query_type].allowedFormats    
-            )
-        } else {
-            applicable_formats = graph_config.resultFormats
-        }
-
-        // Sanitize model
-        
-        // Note: The current format may not be applicable to the combination (uri, query).
+        // Find applicable result formats, sanitize format if needed
+        // Todo: Maybe, the following sanitization should be moved to the model 
+        // Note: The current format may not be applicable to the combination (graph-uri, query).
         // In this case, we change it and silently propagate this change to the model.
 
+        var applicable_formats = m.getApplicableFormats()
+        
         if (applicable_formats.indexOf(format) < 0) {
             format = _(applicable_formats).first();
             m.set('resultFormat', format, { silent: true });
         }   
 
-        // Populate basic inputs
+        // Populate with inputs
                
         this.$el.find('#input-graph_uri').val(uri);
         this.$el.find('#input-query').val(query);
@@ -459,16 +472,26 @@ geoknow.QueryFormView = Backbone.View.extend({
 
         this.editor.setValue(query);
 
-        // Decide if result can support a preview
+        // Decide if format can support a preview/download
         
-        var spec = _(cls.config.resultFormats).findWhere({ value: format });
-        if (_(spec).isUndefined()) {
-            this.error('Unknown resultFormat: ' + format);
+        var $btn_download = this.$el.find('#input-submit-download');
+        var $btn_preview = this.$el.find('#input-submit-preview');
+        
+        if (_(format).isUndefined()) {
+            // This is because no applicable formats exist
+            $btn_download.attr('disabled', 'disabled')
+            $btn_preview.attr('disabled', 'disabled')
+            alert("There is no format applicable to your query!") 
+        } else {
+            var spec = _(cls.config.resultFormats).findWhere({ value: format });
+            if (_(spec).isUndefined()) {
+                this.error('Encountered an unknown result-format: ' + format);
+            } else {
+                $btn_download.attr('disabled', null)
+                $btn_preview.attr('disabled', (spec.preview)? (null):('disabled'));            
+            }
         }
-        
-        var $btn = this.$el.find('#input-submit-preview');
-        $btn.attr('disabled', (spec.preview)? (null):('disabled'));         
-       
+   
         // Populate examples (at 1st time or when graph-uri has changed) 
         
         if (_(ev).isUndefined() || ('graphUri' in (m.changedAttributes() || {}))) {
