@@ -2,7 +2,7 @@
 
 <p><b>Q1:</b> The following SPARQL query identifies the latest update of each dataset after 2011. As this may involve both new datasets, as well as updates in existing ones (before 2011), results come from their union:</p>
 
-<pre>
+<pre class="code code-sparql">
 PREFIX dct: &lt;http://purl.org/dc/terms/&gt;
 PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
 SELECT ?dataURI ?title (MAX(?date) AS ?lastModified)
@@ -22,7 +22,7 @@ ORDER BY ASC(?lastModified)
 
 <p><b>Q2:</b> The following query finds metadata that contain a given keyword in their subject. Then, it returns details about the qualifying datasets (title, subject, URL, etc.):</p>
 
-<pre>
+<pre class="code code-sparql">
 PREFIX dcat: &lt;http://www.w3.org/ns/dcat#&gt;
 PREFIX dct: &lt;http://purl.org/dc/terms/&gt;
 SELECT ?dataURI ?title ?details ?key ?subject ?homeURL
@@ -43,7 +43,7 @@ WHERE {
 
 <p><b>Q3:</b> This query identifies which municipality (INSPIRE data theme: Administrative Units) is at location with geographic coordinates (40.582051 22.952149):</p>
 
-<pre>
+<pre class="code code-sparql">
 PREFIX gn: &lt;http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/&gt;
 PREFIX au: &lt;http://inspire.jrc.ec.europa.eu/schemas/au/3.0/&gt;
 PREFIX geo: &lt;http://www.opengis.net/ont/geosparql#&gt;
@@ -68,7 +68,7 @@ FILTER (geof:sfContains(?fWKT, "&lt;http://www.opengis.net/def/crs/EPSG/0/4326&g
 
 <p><b>Q4:</b> In order to find rivers (INSPIRE data theme: Hydrography) that intersect with Natura 2000 areas (INSPIRE data theme: Protected Sites), the following query performs a join between the two datasets based on spatial intersection of their respective geometries. Evaluation of this query is supported by the underlying spatial index, so that checking each protected zone against each river is avoided if they are spatially distant from each other.</p>
 
-<pre>
+<pre class="code code-sparql">
 PREFIX gn: &lt;http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/&gt;
 PREFIX hy-n: &lt;http://inspire.jrc.ec.europa.eu/schemas/hy-n/3.0/&gt;
 PREFIX ps: &lt;http://inspire.jrc.ec.europa.eu/schemas/ps/3.0/&gt;
@@ -103,7 +103,7 @@ LIMIT 10
 
 <p><b>Q5:</b> Identify any datasets across Europe that are charatcerized by a given subject ("Environment") and their title includes a particular word or phrase (e.g., "network"). Observe that matching of strings (for dataset title) is based on regular expressions:</p>
 
-<pre>
+<pre class="code code-sparql">
 PREFIX dc: &lt;http://purl.org/dc/terms/&gt;
 SELECT *
 WHERE {
@@ -117,7 +117,7 @@ FILTER ( REGEX( str(?k), "*network*" ) )
 
 <p><b>Q6:</b> Issuing the following SPARQL query in will retrieve INSPIRE metadata (in any of the CSWs listed in the middleware) related to architectural features in the environment within a given geographic rectangle. Note that currently, our TripleGeo-CSW middleware only supports geometric comparisons on 2-dimensional rectangles (BOX2D).</p>
 
-<pre>
+<pre class="code code-sparql">
 PREFIX dct: &lt;http://purl.org/dc/terms/&gt;
 PREFIX geo: &lt;http://www.opengis.net/ont/geosparql#&gt;
 PREFIX geof: &lt;http://www.opengis.net/def/geosparql/function/&gt;

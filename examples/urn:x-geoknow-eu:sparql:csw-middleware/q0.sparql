@@ -1,5 +1,5 @@
 PREFIX dcat: <http://www.w3.org/ns/dcat#>
-SELECT *
+CONSTRUCT { ?m dcat:keyword ?k }
 WHERE {
 ?m dcat:keyword ?k .
 FILTER ( REGEX( str(?k), "*administrative*" ) )

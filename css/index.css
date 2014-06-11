@@ -72,9 +72,9 @@
 /* Override CodeMirror's defaults */
 
 .CodeMirror { 
-    font-family: monospace;
+    font-family: "Consolas", "Dejavu Sans Mono", "Liberation Mono", monospace;
     font-size: 12px;
-    line-height: 1.3em;
+    line-height: 15px;
     outline: none; 
     border: 1px solid #ccc; 
 }

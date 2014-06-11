@@ -350,8 +350,6 @@ geoknow.QueryFormView = Backbone.View.extend({
     {
         var view = this; 
         var $editor = this.$el.find('#query-editor');
-
-        this.debug('Creating CodeMirror editor ...')
        
         // Todo: maybe use CodeMirror.fromTextArea ?
 
@@ -799,7 +797,7 @@ geoknow.QueryResultView = Backbone.View.extend({
         this.editor = new CodeMirror($editor.get(0), {
             value: json_dump,
             mode: 'javascript',
-            readonly: true,
+            readOnly: true,
             lineNumbers: true,
         });
         

@@ -67,10 +67,28 @@
     padding: 5px 15px;
 }
 
-#top-container > .tab-pane > .tab p,
-#top-container > .tab-pane > .tab pre {
+#top-container > .tab-pane > .tab h1 {
+    margin: 30px 0px;
+}
+
+#top-container > .tab-pane > .tab h2 {
+    margin: 20px 0px;
+}
+
+#top-container > .tab-pane > .tab p {
     line-height: 1.5em;
     margin: 10px 200px 10px 0px;
 }
 
+#top-container > .tab-pane > .tab > pre,
+#top-container > .tab-pane > .tab > .code {
+    margin: 10px 200px 10px 0px;
+}
+
+#top-container > .tab-pane > .tab > .code {
+    position: relative;
+}
+#top-container > .tab-pane > .tab > .code .CodeMirror {
+    height: 200px;
+}
 

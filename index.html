@@ -166,8 +166,8 @@
 
 var config = {
     theme: 'geodata',
-    pageTitle: '(Geo)SPARQL Query Editor',
-    headerLine: null /*'geoknow-server.imis.athena-innovation.gr'*/,
+    pageTitle: '(Geo) SPARQL Query Editor',
+    headerLine: 'http://geodata.gov.gr/sparql' /*'geoknow-server.imis.athena-innovation.gr'*/,
     menuItems: [
         { text: 'Query',  path: '#editor', title: 'Query editor', },   
         { text: 'About',  path: '#about', title: 'About', },          
@@ -193,7 +193,7 @@ Application = Backbone.Router.extend({
         // Define routes
 
         router.route(/^(about|examples|virtuoso|faq)$/, function (name) {
-            console.debug('Routing to tab with static content: ' + name) 
+            // Routing to a tab with static (lazily-loaded) content
             var $tab = $('#' + name + '-tab')
             if ($tab.data('loaded')) {
                 router._switchTo($tab)
@@ -201,11 +201,25 @@ Application = Backbone.Router.extend({
                 var content_url = 'templates/themes/' + config.theme + '/tabs/' + name + '.html'
                 $.get(content_url)
                     .done(function (markup) {
-                        var $c = $('<div>' + markup + '</div>')
-                        $c.addClass('tab')
-                        $tab.append($c)
-                        $tab.data('loaded', true)
+                        var $content = $('<div>' + markup + '</div>').addClass('tab')
+                        $tab.append($content).data('loaded', true)
                         router._switchTo($tab)
+                        // Todo: Refactor, move to a Backbone.View
+                        $content.find('pre.code-sparql').each(function(i, pre) {
+                            var $pre = $(pre)
+                            var code = $pre.text()
+                            var $div = $('<div>').addClass('code code-sparql')
+                            var $editor = $('<div>').appendTo($div)
+                            var editor = new CodeMirror($editor.get(0), {
+                                readOnly: true,
+                                lineNumbers: true,
+                                mode: 'sparql',
+                            })
+                            $editor.data('editor', editor)
+                            $div.insertAfter($pre)
+                            $pre.remove()
+                            editor.setValue(code)
+                        })
                     })
                     .fail(function () {
                         console.error('Failed to load markup for tab: ' + name)
@@ -214,7 +228,6 @@ Application = Backbone.Router.extend({
         })
 
         router.route(/^editor$/, function () {
-            console.debug('Routing to editor')
             router._switchTo($('#editor-tab'))
         })
        
