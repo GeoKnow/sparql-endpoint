@@ -64,11 +64,12 @@
 }
 
 #top-container > .tab-pane > .tab {
-    padding: 5px 10px;
+    padding: 5px 15px;
 }
 
 #top-container > .tab-pane > .tab p {
     line-height: 1.5em;
+    margin: 10px 200px 10px 0px;
 }
 
 

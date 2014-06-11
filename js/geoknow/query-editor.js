@@ -417,8 +417,6 @@ geoknow.QueryFormView = Backbone.View.extend({
     {
         var cls = this.constructor
         var m = this.model
-       
-        this.debug('Re-rendering form')
 
         var uri = m.get('graphUri');
         var query = m.get('query');

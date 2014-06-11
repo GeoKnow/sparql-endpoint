@@ -303,11 +303,17 @@ $(document).ready(function () {
 // Start
 
 var app = new Application();
-app.navigate(window.location.hash || '#editor', { 
-    trigger: true,
-    replace: true,
-});
 
-Backbone.history.start();
+$(document).ready(function () {
 
+    var path = window.location.hash || '#editor'
+
+    Backbone.history.start();
+    
+    app.navigate(path, { 
+        trigger: true,
+        replace: true,
+    });
+
+})
 </script>
