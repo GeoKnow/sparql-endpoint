@@ -1,0 +1,33 @@
+﻿
+<h2>Exposing INSPIRE Geospatial data as Linked Data</h2>
+
+<p>
+This work has been performed by the <a href="http://www.imis.athena-innovation.gr/">Institute for the Management of Information Systems</a> at <a href="http://www.athena-innovation.gr/">"Athena" Research Center</a> Athena Research Center. It was supported by the European Commission for EU/FP7 projects #318159 "<a href="http://geoknow.eu/">GeoKnow</a>: Making the Web an Exploratory Place for Geospatial Knowledge" and #609608 "<a href="http://www.publicamundi.eu/">PublicaMundi</a>: Scalable and Reusable Open Geospatial Data". 
+</p>
+
+<p>
+The purpose of this work is to lay out a <i>technical roadmap</i> towards repurposing the legally mandated and investment-intensive INSPIRE SDIs as high quality <a href="http://www.w3.org/standards/semanticweb/data">Linked Data</a> sources. The <a href="http://inspire.ec.europa.eu/">INSPIRE Directive</a> by the European Commission sets the legal and technical foundations towards interoperable Spatial Data Infrastructures (SDIs) across Europe. EU member states are already providing such services for several geospatial data themes (e.g., transportation networks, administrative units). Until now, the INSPIRE ecosystem has remained disjoint from the <a href="http://www.w3.org/standards/semanticweb/">Semantic Web</a>, without any means to use this wealth of information as high-quality data sources, and thus multiply their value through interlinking, reasoning and inferencing. 
+</p>
+
+<p>
+Therefore, establishing this <i>"missing link"</i> between INSPIRE and the Semantic Web is very challenging. To the best of our knowledge, ours is the first attempt to build an abstraction layer on top of the INSPIRE infrastructure based on <a href="http://www.opengeospatial.org/standards/geosparql">GeoSPARQL</a> concepts, thus making INSPIRE contents accessible and discoverable as linked data. With this work, we propose a metholology that can be used to repurpose existing INSPIRE SDIs in the Semantic Web, without affecting their established operation in services and applications. This will be significant for the Semantic Web community, given the de facto access to high quality geospatial data, but also a testament for the sound decision making process of the INSPIRE stakeholders regarding forward-compatibility. 
+</p>
+
+<p>
+With our work, we have developed a suite of tools, reusable scripts, and suggested RDF mappings, by also making use of several open-source modules and libraries. Our software is packaged in open-source utility <a href="https://github.com/GeoKnow/TripleGeo">TripleGeo</a> for automatically exposing INSPIRE data and metadata on the Semantic Web through GeoSPARQL endpoints, as well as in the <a href="https://github.com/GeoKnow/TripleGeo-CSW">TripleGeo-CSW</a> middleware for discovering data from existing INSPIRE catalogue services (<a href="http://www.opengeospatial.org/standards/cat">CSW</a>) through a SPARQL endpoint. Further, we have applied such INSPIRE-to-RDF transformations to a real-world <a href="http://geodata.gov.gr/">open data catalogue and SDI</a> with geographic data for Greece and we have set up a <a href="http://geodata.gov.gr/sparql/">web interface</a> with several (Geo)SPARQL endpoints. This service allows users to retrieve data and metadata for Greece for various thematic categories (e.g., administrative units, protected sites), and also discover available INSPIRE datasets across Europe according to user-specified criteria. 
+</p>
+
+<p>
+A comprehensive report of our methodology and practical experience can be found in <a href="http://svn.aksw.org/projects/GeoKnow/Public/D2.7.1_Geodata.gov.gr_Geospatial_Data_as_Linked_Data.pdf">GeoKnow Deliverable D2.7.1</a> 
+on <i>"geodata.gov.gr Geospatial Data as Linked Data"</i>. Most importantly, we have made all our software, datasets, and query examples <a href="https://web.imis.athena-innovation.gr/redmine/projects/geoknow_public/wiki/Inspire2RDF">publicly available</a>  to any interested developers, researchers, and public authorities that may wish to validate our methodology and experiment with transformations into INSPIRE-compliant RDF datasets. 
+</p>
+
+<hr>
+<p>
+<i>
+Development: &copy; 2014 Institute for the Management of Information Systems <br>
+Athena Research Center, Greece. <br>
+Last updated: 6 June 2014 17:00:00 EET.
+</i>
+</p>
+

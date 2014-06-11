@@ -9,9 +9,9 @@
     <p>{{ headerLine }}</p>
 </div>
 <div id="menu-wrapper">
-    <ul class="menu">
-        <li><a target='_blank' href="https://web.imis.athena-innovation.gr/redmine/projects/geoknow_public/wiki/Inspire2RDF">About</a></li>
-        <li><a target='_blank' href="https://web.imis.athena-innovation.gr/redmine/projects/geoknow_public/wiki/">Help</a></li>
-        <li><a target='_blank' href="https://web.imis.athena-innovation.gr/redmine/projects/geoknow_public/wiki/">FAQ</a></li>
+    <ul class="nav nav-pills">
+        {% _(menu).each(function(v) { %}
+        <li><a href="{{ v.path }}" title="{{ v.title }}">{{ v.text }}</a></li>
+        {% }) %}
     </ul>
 </div>

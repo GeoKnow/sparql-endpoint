@@ -2,10 +2,6 @@ window.geoknow || (window.geoknow = {
     // noop
 });
 
-_.templateSettings = {
-   interpolate : /\{\{(.+?)\}\}/g
-};
-
 geoknow.Query = Backbone.Model.extend({
     // Define prototype (instance) properties
     

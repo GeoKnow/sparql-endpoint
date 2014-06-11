@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <title>SPARQL Query Editor</title>
+    <title>(Geo)SPARQL Query Editor</title>
     
     <script src="js/vendor/jquery-1.9.1.js"></script>
     
@@ -33,11 +33,11 @@
   </head>
   
   <body>
-  <div id="top-container" class="container-fluid">
+  <div id="top-container" class="container-fluid"> 
     
     <div id="header" class="row"></div>
 
-    <div id="main-content" class="row">
+    <div id="editor-tab" class="row tab-pane">
 
       <div id="query-pane" class="pane col-xs-5"><div class="panel panel-default">
         
@@ -111,6 +111,14 @@
     
     </div>
     
+    <div id="about-tab" class="row tab-pane" ></div>
+    
+    <div id="examples-tab" class="row tab-pane" ></div>
+   
+    <div id="faq-tab" class="row tab-pane" ></div>
+    
+    <div id="virtuoso-tab" class="row tab-pane" ></div>
+
     <div id="footer" class="row">
     </div>
      
@@ -154,35 +162,116 @@
 
 <script type="text/javascript">
 
-// Setup theme-specific parts (stylesheets, page headers)
+// Settings
+
+var config = {
+    theme: 'geodata',
+    pageTitle: '(Geo)SPARQL Query Editor',
+    headerLine: null /*'geoknow-server.imis.athena-innovation.gr'*/,
+    menuItems: [
+        { text: 'Query',  path: '#editor', title: 'Query editor', },   
+        { text: 'About',  path: '#about', title: 'About', },          
+        { text: 'FAQ',  path: '#faq', title: 'Frequently Asked Questions', },          
+        { text: 'Examples',  path: '#examples', title: 'Examples', },          
+        { text: 'Virtuoso',  path: '#virtuoso', title: 'Direct access to Virtuoso endpoint', },          
+    ],
+};
+
+_.templateSettings = {
+   interpolate : /\{\{(.+?)\}\}/g,
+   evaluate: /\{\%(.+?)\%\}/g,
+};
+
+// Setup router
+
+Application = Backbone.Router.extend({
+
+    initialize: function() 
+    {
+        var router = this
+        
+        // Define routes
+
+        router.route(/^(about|examples|virtuoso|faq)$/, function (name) {
+            console.debug('Routing to tab with static content: ' + name) 
+            var $tab = $('#' + name + '-tab')
+            if ($tab.data('loaded')) {
+                router._switchTo($tab)
+            } else {
+                var content_url = 'templates/themes/' + config.theme + '/tabs/' + name + '.html'
+                $.get(content_url)
+                    .done(function (markup) {
+                        var $c = $('<div>' + markup + '</div>')
+                        $c.addClass('tab')
+                        $tab.append($c)
+                        $tab.data('loaded', true)
+                        router._switchTo($tab)
+                    })
+                    .fail(function () {
+                        console.error('Failed to load markup for tab: ' + name)
+                    })
+            }
+        })
+
+        router.route(/^editor$/, function () {
+            console.debug('Routing to editor')
+            router._switchTo($('#editor-tab'))
+        })
+       
+        // Begin with all tabs hidden
+
+        $('#top-container > .tab-pane').hide()
+
+        return
+    },
+
+    _activeTab: null, 
+
+    _switchTo: function(tab) 
+    {
+        var router = this
+        var $tab = _.isString(tab)? $(tab) : tab
+        
+        if (!($tab.is('.tab-pane'))) {
+            return;
+        }
+        if (router._activeTab) {
+            $(router._activeTab).hide()
+        }
+        $tab.fadeIn()
+        router._activeTab = $tab.selector
+        
+        return;
+    }
+});
+
+// Setup theme-specific parts (menus, stylesheets, page headers)
 
 $(document).ready(function () {
-    
-    var THEME_NAME = 'geodata'
-    
-    $('body').addClass('theme-' + THEME_NAME)
+        
+    $('body').addClass('theme-' + config.theme)
 
     var $link = $('<link>')
         .attr('rel', 'stylesheet')
-        .attr('href', 'css/themes/' + THEME_NAME + '/style.css')
+        .attr('href', 'css/themes/' + config.theme + '/style.css')
     $('head').append($link)
 
-    var header_tpl = 'templates/themes/' + THEME_NAME + '/header.html'
+    var header_tpl = 'templates/themes/' + config.theme + '/header.html'
     $.get(header_tpl)
         .done(function (data) {
             var header = _.template(data)({ 
-                title: '(Geo)SPARQL Query Editor',
-                headerLine: null /*'geoknow-server.imis.athena-innovation.gr'*/,
+                title: config.pageTitle,
+                headerLine: config.headerLine, 
+                menu: config.menuItems,
             }) 
             $('#header').append($(header))
         })
         .fail(function () {
             console.error('Failed to load markup for page header')
         })
-
 })
 
-// Main
+// Setup query/preview panels
 
 $(document).ready(function () {
     
@@ -207,9 +296,18 @@ $(document).ready(function () {
             model: g.query,
             el: '#results-pane',
         });
-
+        
     });
-
 });
+
+// Start
+
+var app = new Application();
+app.navigate(window.location.hash || '#editor', { 
+    trigger: true,
+    replace: true,
+});
+
+Backbone.history.start();
 
 </script>

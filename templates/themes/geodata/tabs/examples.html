@@ -1,0 +1,143 @@
+﻿<h2>Query examples on INSPIRE metadata</h2>
+
+<p><b>Q1:</b> The following SPARQL query identifies the latest update of each dataset after 2011. As this may involve both new datasets, as well as updates in existing ones (before 2011), results come from their union:</p>
+
+<pre>
+PREFIX dct: &lt;http://purl.org/dc/terms/&gt;
+PREFIX xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+SELECT ?dataURI ?title (MAX(?date) AS ?lastModified)
+WHERE {
+   { ?dataURI dct:title ?title . 
+     ?dataURI dct:created ?date } 
+   UNION 
+   { ?dataURI dct:title ?title . 
+     ?dataURI dct:modified ?date }
+   FILTER  ( ?date &gt;= "2011-01-01"^^xsd:date )
+}
+GROUP BY ?dataURI ?title
+ORDER BY ASC(?lastModified)
+</pre>
+
+</br>
+
+<p><b>Q2:</b> The following query finds metadata that contain a given keyword in their subject. Then, it returns details about the qualifying datasets (title, subject, URL, etc.):</p>
+
+<pre>
+PREFIX dcat: &lt;http://www.w3.org/ns/dcat#&gt;
+PREFIX dct: &lt;http://purl.org/dc/terms/&gt;
+SELECT ?dataURI ?title ?details ?key ?subject ?homeURL
+WHERE {
+   ?dataURI dct:title ?title .
+   ?dataURI dct:subject ?subject .
+   ?dataURI dct:description ?details .
+   ?dataURI dcat:landingPage ?homeURL .
+   ?dataURI dcat:keyword ?key .
+   FILTER (REGEX(?subject, "^environment*", "i"))
+}
+</pre>
+
+<br>
+
+<h2>Query examples on INSPIRE-aligned data</h2>
+
+
+<p><b>Q3:</b> This query identifies which municipality (INSPIRE data theme: Administrative Units) is at location with geographic coordinates (40.582051 22.952149):</p>
+
+<pre>
+PREFIX gn: &lt;http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/&gt;
+PREFIX au: &lt;http://inspire.jrc.ec.europa.eu/schemas/au/3.0/&gt;
+PREFIX geo: &lt;http://www.opengis.net/ont/geosparql#&gt;
+PREFIX geof: &lt;http://www.opengis.net/def/function/geosparql/&gt;
+PREFIX sf: &lt;http://www.opengis.net/ont/sf#&gt;
+SELECT ?nCode ?aName
+WHERE {
+?f au:nationalCode ?nCode .
+?f au:name ?a .
+?a gn:GeographicalName ?gnName .
+?gnName gn:spelling ?spn .
+?spn gn:SpellingOfName ?spt .
+?spt gn:text ?aName .
+?f geo:hasGeometry ?fGeom .
+?fGeom geo:asWKT ?fWKT .
+FILTER (geof:sfContains(?fWKT, "&lt;http://www.opengis.net/def/crs/EPSG/0/4326&gt; POINT (40.582051 22.952149)"^^sf:wktLiteral))
+}
+</pre>
+
+<p>This is a typical example of spatial containment, where the query processor searches for any polygon geometry that topologically contains the given point. Also note that the location is specified in WGS84 lon/lat coordinates (in decimal degrees), whereas the data is stored in GreekGrid87 coordinates (in meters). So, the spatial engine of the triple store supports multiple georeference systems!</p>
+
+
+<p><b>Q4:</b> In order to find rivers (INSPIRE data theme: Hydrography) that intersect with Natura 2000 areas (INSPIRE data theme: Protected Sites), the following query performs a join between the two datasets based on spatial intersection of their respective geometries. Evaluation of this query is supported by the underlying spatial index, so that checking each protected zone against each river is avoided if they are spatially distant from each other.</p>
+
+<pre>
+PREFIX gn: &lt;http://inspire.jrc.ec.europa.eu/schemas/gn/3.0/&gt;
+PREFIX hy-n: &lt;http://inspire.jrc.ec.europa.eu/schemas/hy-n/3.0/&gt;
+PREFIX ps: &lt;http://inspire.jrc.ec.europa.eu/schemas/ps/3.0/&gt;
+PREFIX geo: &lt;http://www.opengis.net/ont/geosparql#&gt;
+PREFIX geof: &lt;http://www.opengis.net/def/function/geosparql/&gt;
+SELECT ?riverName ?siteName
+WHERE { 
+?q hy-n:geographicalName ?r .
+?r gn:GeographicalName ?rnName .
+?rnName gn:spelling ?rspn .
+?rspn gn:SpellingOfName ?rspt .
+?rspt gn:text ?riverName .
+?q geo:hasGeometry ?qGeom .
+?qGeom geo:asWKT ?qWKT .
+?f ps:siteName ?p .
+?p gn:GeographicalName ?gnName .
+?gnName gn:spelling ?spn .
+?spn gn:SpellingOfName ?spt .
+?spt gn:text ?siteName .
+?f geo:hasGeometry ?fGeom .
+?fGeom geo:asWKT ?fWKT .
+FILTER (geof:sfIntersects(?fWKT, ?qWKT))
+}
+LIMIT 10
+</pre>
+
+<p>Depending on the total amount of triples in the store and the complexity of geometries, this query should better specify a 'LIMIT k' clause, otherwise it may take a long time to provide a response.</p>
+
+
+<h2>Query examples against INSPIRE Catalogue Services (CSW)</h2>
+
+
+<p><b>Q5:</b> Identify any datasets across Europe that are charatcerized by a given subject ("Environment") and their title includes a particular word or phrase (e.g., "network"). Observe that matching of strings (for dataset title) is based on regular expressions:</p>
+
+<pre>
+PREFIX dc: &lt;http://purl.org/dc/terms/&gt;
+SELECT *
+WHERE {
+?m dc:subject "Environment" .
+?m dc:title ?k .
+FILTER ( REGEX( str(?k), "*network*" ) )
+}
+</pre>
+
+</br>
+
+<p><b>Q6:</b> Issuing the following SPARQL query in will retrieve INSPIRE metadata (in any of the CSWs listed in the middleware) related to architectural features in the environment within a given geographic rectangle. Note that currently, our TripleGeo-CSW middleware only supports geometric comparisons on 2-dimensional rectangles (BOX2D).</p>
+
+<pre>
+PREFIX dct: &lt;http://purl.org/dc/terms/&gt;
+PREFIX geo: &lt;http://www.opengis.net/ont/geosparql#&gt;
+PREFIX geof: &lt;http://www.opengis.net/def/geosparql/function/&gt;
+SELECT *
+WHERE { ?m dct:subject ?k .
+        ?m dct:title "Architectural" .
+        ?m geo:hasGeometry ?fWKT .
+        FILTER ( REGEX(str(?k), "^environment*") &amp;&amp;
+                 geof:sfWithin(?fWKT, "BOX2D(-6.51 53.27, -6.28 53.36)"^^geo:wktLiteral) )
+      }
+</pre>
+
+<p>The TripleGeo-CSW middleware rewrites this query into an equivalent GetRecords request according to OGC specifications, which is then automatically submitted to each of the available CSWs. Finally, all resulting triples are generated on-the-fly based on the XML response from CSWs.</p>
+
+
+<hr>
+<p>
+<i>
+Development: &copy; 2014 Institute for the Management of Information Systems <br>
+Athena Research Center, Greece. <br>
+Last updated: 6 June 2014 17:00:00 EET.
+</i>
+</p>

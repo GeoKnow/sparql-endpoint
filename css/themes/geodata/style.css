@@ -19,7 +19,7 @@
     display: block;
     position: absolute;
     right: 0px;
-    top: 80%;
+    top: 70%;
     border: dotted 0px silver;
 }
 
@@ -58,3 +58,17 @@
     font-family: consolas, monospace;
     color: #888;
 }
+
+#top-container > .tab-pane {
+    padding: 0px 8px;
+}
+
+#top-container > .tab-pane > .tab {
+    padding: 5px 10px;
+}
+
+#top-container > .tab-pane > .tab p {
+    line-height: 1.5em;
+}
+
+
