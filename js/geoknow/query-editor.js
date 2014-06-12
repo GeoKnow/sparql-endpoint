@@ -41,60 +41,6 @@ geoknow.Query = Backbone.Model.extend({
         return 0;
     },
     
-    detectType: function()
-    {
-        var cls = this.constructor;
-        var query = this.get('query');
-
-        // Map this query to one of the basic types listed in cls.queryTypes.
-        // Return undefined if unable to detect it or if no query is supplied (yet).
- 
-        if (!query) {
-            return undefined;
-        }
-
-        var re_prefix = /PREFIX[\s]*[-a-z]+:[\s]*<[^\s]+>$/mig;
-        
-        //// Todo: parse the whole SELECT/CONSTRUCT clause 
-        //var re_select_clause = /^SELECT[\s]+((DISTINCT|REDUCED)[\s]+)?([\?\$][a-z][_a-z0-9]*)\b/i 
-        //var re_construct_clause = /^CONSTRUCT[\s]+\{[^\{]+\}/i 
-
-        var q = query.replace(re_prefix, "").trim();
-
-        if (q.match(/SELECT\b/i)) {
-            return 'select';
-        } else if (q.match(/CONSTRUCT\b/i)) {
-            return 'construct';
-        }
-
-        return undefined;
-    },
-
-    getApplicableFormats: function()
-    {
-        // Find all applicable result formats for current (graph-uri, query)
-        // Note that current format may not belong to them, i.e. it will be
-        // considered invalid.
-       
-        var cls = this.constructor;
-        var uri = this.get('graphUri')
-        
-        var t = this.detectType();
-
-        var applicable_formats = null;
-       
-        if (t) {
-            applicable_formats = _.intersection(
-                cls.config.graphs[uri].resultFormats,
-                cls.queryTypes[t].allowedFormats    
-            )
-        } else {
-            applicable_formats = cls.config.graphs[uri].resultFormats
-        }
-
-        return applicable_formats;
-    },
-
     sendQuery: function() 
     {
         var cls = this.constructor
@@ -246,11 +192,69 @@ geoknow.Query = Backbone.Model.extend({
 
         return jqxhr;
     },
+
+    getGraphConfig: function(uri)
+    { 
+        return this.config.graphs[uri];
+    },
+    
+    findApplicableFormats: function(uri, query)
+    {
+        var cls = this
+        
+        // Find all applicable result formats for current (graph-uri, query)
+         
+        var query_type = cls.detectType(query);
+
+        var applicable_formats = null;
+       
+        if (query_type) {
+            applicable_formats = _.intersection(
+                cls.config.graphs[uri].resultFormats,
+                cls.queryTypes[query_type].allowedFormats    
+            )
+        } else {
+            applicable_formats = cls.config.graphs[uri].resultFormats
+        }
+
+        return applicable_formats;
+    },
+    
+    detectType: function(query)
+    {
+        var cls = this;
+
+        // Map query to one of the basic types listed in cls.queryTypes.
+        // Return undefined if unable to detect it or if no query is supplied (yet).
+ 
+        if (!query) {
+            return undefined;
+        }
+
+        var re_prefix = /PREFIX[\s]*[-a-z]+:[\s]*<[^\s]+>$/mig;
+        
+        //// Todo: parse the whole SELECT/CONSTRUCT clause 
+        //var re_select_clause = /^SELECT[\s]+((DISTINCT|REDUCED)[\s]+)?([\?\$][a-z][_a-z0-9]*)\b/i 
+        //var re_construct_clause = /^CONSTRUCT[\s]+\{[^\{]+\}/i 
+
+        var q = query.replace(re_prefix, "").trim();
+
+        if (q.match(/SELECT\b/i)) {
+            return 'select';
+        } else if (q.match(/CONSTRUCT\b/i)) {
+            return 'construct';
+        }
+
+        return undefined;
+    },
+
 });
 
 geoknow.QueryHistory = Backbone.Collection.extend({
     // Define prototype (instance) properties
     
+    // Todo
+
     model: geoknow.Query,
 }, {
     // Define class properties
@@ -438,32 +442,21 @@ geoknow.QueryFormView = Backbone.View.extend({
 
     _renderForm: function(ev)
     {
-        var cls = this.constructor
-        var m = this.model
+        var F = this.constructor
+        var Q = this.model.constructor 
 
-        var uri = m.get('graphUri');
-        var query = m.get('query');
-        var format = m.get('resultFormat');
-        var graph_config = m.constructor.config.graphs[uri];
+        var uri = this.model.get('graphUri');
+        var query = this.model.get('query');
+        var format = this.model.get('resultFormat');
+        var graph_config = Q.getGraphConfig(uri);
+        var applicable_formats = Q.findApplicableFormats(uri, query)
 
-        // Find applicable result formats, sanitize format if needed
-        // Todo: Maybe, the following sanitization should be moved to the model 
-        // Note: The current format may not be applicable to the combination (graph-uri, query).
-        // In this case, we change it and silently propagate this change to the model.
-
-        var applicable_formats = m.getApplicableFormats()
-        
-        if (applicable_formats.indexOf(format) < 0) {
-            format = _(applicable_formats).first();
-            m.set('resultFormat', format, { silent: true });
-        }   
-
-        // Populate with inputs
+        // Assign input values
                
         this.$el.find('#input-graph_uri').val(uri);
         this.$el.find('#input-query').val(query);
         
-        this._populateSelect('input-result_format', _(cls.config.resultFormats).filter(function(v) {
+        this._populateSelect('input-result_format', _(F.config.resultFormats).filter(function(v) {
             return !(applicable_formats.indexOf(v.value) < 0)  
         }));
         this.$el.find('#input-result_format').val(format);
@@ -481,9 +474,9 @@ geoknow.QueryFormView = Backbone.View.extend({
             // This is because no applicable formats exist
             $btn_download.attr('disabled', 'disabled')
             $btn_preview.attr('disabled', 'disabled')
-            alert("There is no format applicable to your query!") 
+            this.error("There is no format applicable to your query!") 
         } else {
-            var spec = _(cls.config.resultFormats).findWhere({ value: format });
+            var spec = _(F.config.resultFormats).findWhere({ value: format });
             if (_(spec).isUndefined()) {
                 this.error('Encountered an unknown result-format: ' + format);
             } else {
@@ -494,7 +487,7 @@ geoknow.QueryFormView = Backbone.View.extend({
    
         // Populate examples (at 1st time or when graph-uri has changed) 
         
-        if (_(ev).isUndefined() || ('graphUri' in (m.changedAttributes() || {}))) {
+        if (_(ev).isUndefined() || ('graphUri' in (this.model.changedAttributes() || {}))) {
             this._populateSelect('input-example_query', _(graph_config.examples).map(function(v) {
                 return { 
                     value: 'examples/' + uri + '/' + v.file, 
@@ -508,13 +501,9 @@ geoknow.QueryFormView = Backbone.View.extend({
 
     _renderSpinner: function()
     {
-        var m = this.model
-        
-        //this.debug('_renderSpinner(): state = '+ m.get('state') +' ...');
-        
         var spinner = this.spinner;
         var timer = $(spinner).data('start-timer');
-        if (m.get('state') == 'waiting') {
+        if (this.model.get('state') == 'waiting') {
             // Create a spinner only if there is not a pending one
             if (_.isUndefined(timer)) {
                 timer = window.setTimeout(function() { 
@@ -537,11 +526,27 @@ geoknow.QueryFormView = Backbone.View.extend({
 
     updateQuery: function (ev) 
     {
-        var val = $(ev.target).val()
+        var uri = this.model.get('graphUri')
+        var query = $(ev.target).val()
+        var format = this.model.get('resultFormat')
         
-        // Todo: sanitize val
+        this.debug('The input query was updated by the user')
+
+        // Find applicable result formats, sanitize format if needed
+        // Note: The current format may not be applicable to the combination (graph-uri, query).
+        // In this case, we should also update the format.
+
+        var applicable_formats = this.model.constructor.findApplicableFormats(uri, query)
         
-        this.model.set('query', val)
+        if (applicable_formats.indexOf(format) < 0) {
+            format = _(applicable_formats).first();
+            this.model.set({
+                query: query,
+                resultFormat: format,
+            })
+        } else {
+            this.model.set('query', query)
+        }  
 
         return true;
     },
@@ -557,12 +562,11 @@ geoknow.QueryFormView = Backbone.View.extend({
     
     updateGraphUri: function (ev) 
     {
-        var m = this.model;
         var uri = $(ev.target).val();
 
-        var graph_config = m.constructor.config.graphs[uri];
+        var graph_config = this.model.constructor.getGraphConfig(uri);
         
-        m.set({
+        this.model.set({
             graphUri: uri,
             query: '',
             resultFormat: _(graph_config.resultFormats).first(),
@@ -611,7 +615,7 @@ geoknow.QueryFormView = Backbone.View.extend({
         $.get(resource_url)
             .done(function (data) {
                 view.debug('Loading query textarea (' + data.length + ' chars)')
-                view.model.set('query', data)
+                view.$el.find('#input-query').val(data).trigger('change') 
             })
             .fail(function() {
                 view.error('Failed to load resource: ' + resource_url);
@@ -747,7 +751,7 @@ geoknow.QueryResultView = Backbone.View.extend({
     {
         var m = this.model
        
-        this.debug('_preview(): state=' + m.get('state'));
+        //this.debug('_preview(): state=' + m.get('state'));
 
         // Delegate to the proper previewer    
         
@@ -780,8 +784,6 @@ geoknow.QueryResultView = Backbone.View.extend({
     {
         var cls = this.constructor
         var m = this.model
-
-        this.debug('Creating preview from JSON object ...')
         
         var result = m.get('result')
         var format = m.get('resultFormat')
