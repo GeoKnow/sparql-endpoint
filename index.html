@@ -37,7 +37,7 @@
     
     <div id="header" class="row"></div>
 
-    <div id="editor-tab" class="row tab-pane">
+    <div id="query-tab" class="row tab-pane">
 
       <div id="query-pane" class="pane col-xs-5"><div class="panel panel-default">
         
@@ -118,6 +118,8 @@
     <div id="faq-tab" class="row tab-pane" ></div>
     
     <div id="virtuoso-tab" class="row tab-pane" ></div>
+    
+    <div id="foo-tab" class="row tab-pane" ></div>
 
     <div id="footer" class="row">
     </div>
@@ -160,6 +162,7 @@
 
 </html>
 
+<script type="text/javascript" src="js/index.js"></script>
 <script type="text/javascript">
 
 // Settings
@@ -186,76 +189,73 @@ _.templateSettings = {
 
 Application = Backbone.Router.extend({
 
-    initialize: function() 
+    query: null,
+
+    tabs: null,
+
+    initialize: function(options) 
     {
         var router = this
         
-        // Define routes
+        this.query = options.query
 
-        router.route(/^(about|examples|virtuoso|faq)$/, function (name) {
-            // Routing to a tab with static (lazily-loaded) content
-            var $tab = $('#' + name + '-tab')
-            if ($tab.data('loaded')) {
-                router._switchTo($tab)
-            } else {
-                var content_url = 'templates/themes/' + config.theme + '/tabs/' + name + '.html'
-                $.get(content_url)
-                    .done(function (markup) {
-                        var $content = $('<div>' + markup + '</div>').addClass('tab')
-                        $tab.append($content).data('loaded', true)
-                        router._switchTo($tab)
-                        // Todo: Refactor, move to a Backbone.View
-                        $content.find('pre.code-sparql').each(function(i, pre) {
-                            var $pre = $(pre)
-                            var code = $pre.text()
-                            var $div = $('<div>').addClass('code code-sparql')
-                            var $editor = $('<div>').appendTo($div)
-                            var editor = new CodeMirror($editor.get(0), {
-                                readOnly: true,
-                                lineNumbers: true,
-                                mode: 'sparql',
-                            })
-                            $editor.data('editor', editor)
-                            $div.insertAfter($pre)
-                            $pre.remove()
-                            editor.setValue(code)
-                        })
-                    })
-                    .fail(function () {
-                        console.error('Failed to load markup for tab: ' + name)
-                    })
-            }
+        var tpl = function(path) {
+            return 'templates/themes/' + config.theme + '/' + path;
+        }   
+
+        this.tabs = {
+            'editor': new workspace.QueryTabView({
+                model: this.query,
+                el: '#query-tab',
+                name: 'Query'
+            }),
+            'about': new workspace.PageTabView({
+                model: null,
+                el: '#about-tab',
+                name: 'About',
+                source: tpl('tabs/about.html'),
+            }),            
+            'faq': new workspace.PageTabView({
+                model: null,
+                el: '#faq-tab',
+                name: 'FAQ',
+                source: tpl('tabs/faq.html'),
+            }),
+            'virtuoso': new workspace.PageTabView({
+                model: null,
+                el: '#virtuoso-tab',
+                name: 'Virtuoso',
+                source: tpl('tabs/virtuoso.html'),
+            }),
+            'examples': new workspace.CodeTabView({
+                model: null,
+                el: '#examples-tab',
+                name: 'Examples',
+                source: tpl('tabs/examples.html'),
+            }),
+        }
+
+        var curr_tab = null;
+
+        router.route(/^(editor|about|examples|virtuoso|faq)$/, function (name) {
+            
+            var tab = router.tabs[name]
+            
+            tab.prepare().done(function() {
+
+                tab.setActive(true)
+            
+                if (curr_tab) {
+                    curr_tab.setActive(false)
+                }
+                curr_tab = tab
+            });
+
+            return
         })
-
-        router.route(/^editor$/, function () {
-            router._switchTo($('#editor-tab'))
-        })
-       
-        // Begin with all tabs hidden
-
-        $('#top-container > .tab-pane').hide()
 
         return
     },
-
-    _activeTab: null, 
-
-    _switchTo: function(tab) 
-    {
-        var router = this
-        var $tab = _.isString(tab)? $(tab) : tab
-        
-        if (!($tab.is('.tab-pane'))) {
-            return;
-        }
-        if (router._activeTab) {
-            $(router._activeTab).hide()
-        }
-        $tab.fadeIn()
-        router._activeTab = $tab.selector
-        
-        return;
-    }
 });
 
 // Setup theme-specific parts (menus, stylesheets, page headers)
@@ -264,9 +264,13 @@ $(document).ready(function () {
         
     $('body').addClass('theme-' + config.theme)
 
+    var asset = function(path) {
+        return 'css/themes/' + config.theme + '/' + path;
+    }
+
     var $link = $('<link>')
         .attr('rel', 'stylesheet')
-        .attr('href', 'css/themes/' + config.theme + '/style.css')
+        .attr('href', asset('style.css'))
     $('head').append($link)
 
     var header_tpl = 'templates/themes/' + config.theme + '/header.html'
@@ -276,6 +280,7 @@ $(document).ready(function () {
                 title: config.pageTitle,
                 headerLine: config.headerLine, 
                 menu: config.menuItems,
+                asset: asset,
             }) 
             $('#header').append($(header))
         })
@@ -284,49 +289,29 @@ $(document).ready(function () {
         })
 })
 
-// Setup query/preview panels
+// Setup application
+
+var app = null
 
 $(document).ready(function () {
-    
-    geoknow.workspace = {};
 
-    var g = geoknow.workspace;
+    geoknow.Query.initialize().done(function() {
 
-    var p = geoknow.Query.initialize();
-
-    p.done(function() {
-
-        g.query = new geoknow.Query({ 
-            query: '', 
-        });
-
-        g.pane1 = new geoknow.QueryFormView({
-            model: g.query,
-            el: '#query-pane',
-        });
-
-        g.pane2 = new geoknow.QueryResultView({
-            model: g.query,
-            el: '#results-pane',
+        var path = window.location.hash || '#editor'
+        
+        var query = new geoknow.Query();
+        
+        app = new Application({
+            query: query
         });
         
+        Backbone.history.start();
+
+        app.navigate(path, { 
+            trigger: true,
+            replace: true,
+        });
     });
 });
 
-// Start
-
-var app = new Application();
-
-$(document).ready(function () {
-
-    var path = window.location.hash || '#editor'
-
-    Backbone.history.start();
-    
-    app.navigate(path, { 
-        trigger: true,
-        replace: true,
-    });
-
-})
 </script>
