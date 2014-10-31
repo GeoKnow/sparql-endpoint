@@ -1,7 +1,10 @@
 PREFIX dc: <http://purl.org/dc/terms/>
-SELECT * 
+CONSTRUCT { { ?s dc:subject "road" }    
+            UNION
+            { ?s dc:subject "water" } }
 WHERE {
 { ?s dc:subject "road" }    
 UNION
 { ?s dc:subject "water" }
 }
+
