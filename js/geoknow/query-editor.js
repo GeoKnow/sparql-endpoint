@@ -740,9 +740,7 @@ geoknow.QueryResultView = Backbone.View.extend({
 
         // Subscribe to events
 
-        this.listenTo(this.model, "change:state change:result", this.render);
-        
-        
+        this.listenTo(this.model, "change:state change:result", this.render);        
         
         this.debug('Initialized')
     },
@@ -904,7 +902,7 @@ geoknow.QueryResultView = Backbone.View.extend({
             alert ('The result is malformed and cannot be previewed.')
             return;
         }
-        
+        //alert($table.html());
         // Render 
         
         var size = $table.find("tr td:first-child").length;
