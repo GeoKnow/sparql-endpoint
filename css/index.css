@@ -45,6 +45,12 @@
     padding-right: 5px;
 } 
 
+#results-map { 
+    position: relative;
+    margin: 0px 0px; 
+    height: 490px;
+ }
+ 
 #results-body { 
     position: relative;
     margin: 0px 0px; 

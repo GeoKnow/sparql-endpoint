@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <title>(Geo)SPARQL Query Editor</title>
-    
+        
     <script src="js/vendor/jquery-1.9.1.js"></script>
     
     <script src="js/vendor/bootstrap/3.1.1/bootstrap.min.js"></script>
@@ -26,6 +26,9 @@
 
     <script src="js/vendor/spin.min.js"></script>
     
+    <script src="js/vendor/OpenLayers/OpenLayers.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vendor/Proj4js/proj4js-combined.min.js" type="text/javascript" charset="utf-8"></script>
+        
     <script src="js/geoknow/query-editor.js"></script>
 
     <link rel="stylesheet" href="css/index.css" />
@@ -101,10 +104,16 @@
         </div>
         
         <div id="results-pane-body" class="panel-body">
+            <ul id="results-nav-bar" class="nav nav-tabs">
+                <li id="results-nav-bar-table" class="active"><a>Table</a></li>
+                <li id="results-nav-bar-map"><a>Map</a></li>
+            </ul>
           <div id="results-container">
             <div id="results-caption"></div>
             <div id="results-body"></div>
+            <div id="results-map"></div>
           </div>
+            
         </div>
 
       </div></div> <!-- .panel --><!-- #results-pane -->
@@ -131,6 +140,7 @@
 
   </body>
  
+  
   <div class="undescore-template hidden" id="form-group-input-text-template">
     <div id="{{name}}-form-group" class="form-group">
       <label for="input-{{name}}">{{label}}:</label>

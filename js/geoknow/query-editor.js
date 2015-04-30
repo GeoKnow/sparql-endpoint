@@ -657,6 +657,10 @@ geoknow.QueryResultView = Backbone.View.extend({
 
     editor: null, /* for creating (readonly) previews for code snippets */
 
+    map: null,
+    
+    mapInited: false,
+    
     templates: {
         caption: null,
         heading: null,
@@ -670,11 +674,56 @@ geoknow.QueryResultView = Backbone.View.extend({
         this.debug('Finished setup of delegated events')
         
         return {
+            "click   #results-nav-bar-table" : this.previewOnTable,
+            "click   #results-nav-bar-map" : this.previewOnMap,
         };    
+    },
+    
+    previewOnTable: function()
+    {
+        this.$el.find('#results-nav-bar-table').addClass('active');
+        this.$el.find('#results-nav-bar-map').removeClass('active');
+        this.$el.find('#results-body').show();
+        this.$el.find('#results-map').hide();
+        return false;
+    },
+    
+    previewOnMap: function()
+    {
+        if ( !this.isMapInitialized() ) {        
+            this.initializeMap();
+        }
+        this.$el.find('#results-nav-bar-map').addClass('active');
+        this.$el.find('#results-nav-bar-table').removeClass('active');
+        this.$el.find('#results-body').hide();
+        this.$el.find('#results-map').show();
+        return false;
+    },
+    
+    isMapInitialized: function() {
+        return this.mapInited;
+    },
+    
+    // Initialize map
+    initializeMap: function() {
+        this.map = new OpenLayers.Map('results-map', {maxResolution: 10000});
+        var wms = new OpenLayers.Layer.WMS("OpenLayers WMS",
+                "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic'});
+        this.map.addLayer(wms);
+        this.map.zoomToExtent();
+        
+        this.editor = null;
+
+        this.mapInited = true;
     },
     
     initialize: function()
     {
+        
+        //map.zoomToMaxExtent();
+        
+        //alert(this.$el.find('#results-nav-bar '));
+        
         // Initialize templates
         
         this.templates.heading = _.template($('#results-success-heading-template').html());
@@ -692,6 +741,8 @@ geoknow.QueryResultView = Backbone.View.extend({
         // Subscribe to events
 
         this.listenTo(this.model, "change:state change:result", this.render);
+        
+        
         
         this.debug('Initialized')
     },
@@ -711,8 +762,6 @@ geoknow.QueryResultView = Backbone.View.extend({
         }
 
         this.$el.find('#results-body').empty();
-
-        this.editor = null;
         
         return;
     },
@@ -724,6 +773,7 @@ geoknow.QueryResultView = Backbone.View.extend({
         // Proceed only if model has entered idle state
         
         if (m.get('state') != 'idle') {
+            
             return;
         }
        
