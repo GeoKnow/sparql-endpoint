@@ -660,18 +660,20 @@ geoknow.QueryResultView = Backbone.View.extend({
     // OpenLayers Map
     map: null,
     mapInited: false,
-    
     geoContext: null,
     
     geoLayer: null,
+    geoLayerFeatures: [],
     
     geoStyle: null,
     
-    wktFormatter: null,
+    wktFormatter: new OpenLayers.Format.WKT(),
     
     projections: {
-        WGS84: new OpenLayers.Projection("EPSG:4326")
-        //Greek Proj
+        WGS84: new OpenLayers.Projection("EPSG:4326"),
+        mapProj: new OpenLayers.Projection("EPSG:900913"),
+        grProj: new OpenLayers.Projection("EPSG:2100")
+        //Greek Proj EPSG 0/2100
     },
     
     templates: {
@@ -718,16 +720,21 @@ geoknow.QueryResultView = Backbone.View.extend({
         return this.mapInited;
     },
     
+    _populateGeometryLayer: function() {
+        alert("populating");
+        this.geoLayer.addFeatures(this.geoLayerFeatures);
+    },
+    
     // Initialize map
     initializeMap: function() {
-        this.map = new OpenLayers.Map('results-map', {maxResolution: 1000});
+        this.map = new OpenLayers.Map('results-map', {numZoomLevels: 32, projection: this.projections.mapProj, maxResolution: 1000});
         var wms = new OpenLayers.Layer.WMS("OpenLayers WMS",
                 "http://vmap0.tiles.osgeo.org/wms/vmap0", {zoom: 100, layers: 'basic'});
                 var OSMLayer = new OpenLayers.Layer.OSM("OSM");
                 OSMLayer.sphericalMercator = true;
         this.map.addLayer(OSMLayer);
-        
         //this.map.addLayer(wms);
+        
         this.map.zoomToMaxExtent();
 
         this.geoContext = {
@@ -752,19 +759,20 @@ geoknow.QueryResultView = Backbone.View.extend({
             'Preview Layer', { 
                 isBaseLayer: false,
                 styleMap: new OpenLayers.StyleMap(this.geoStyle)
-            });        
-            
+            });
+                    
         this.map.addLayer(this.geoLayer);
-        
-        this.wktFormatter = new OpenLayers.Format.WKT();
-        
-        /* DEBUG geom
+        this._populateGeometryLayer();
+
+        alert('reached size : '+this.geoLayerFeatures.length);
+        // DEBUG geom
+        /*
         var polygonFeatureW = this.wktFormatter.read("POLYGON((20.000001 37.000001, 20.000001 39.000001, 22.000001 39.000001, 22.000001 37.000001, 20.000001 37.000001))");
         polygonFeatureW.attributes = {'geom': 'tomaras'};
         polygonFeatureW.geometry.transform(this.projections.WGS84, this.map.getProjectionObject());
         this.geoLayer.addFeatures([polygonFeatureW]);
         */
-       
+     
         this.editor = null;
         
         this.mapInited = true;
@@ -937,7 +945,6 @@ geoknow.QueryResultView = Backbone.View.extend({
     _containsGeometryType: function(value) {
         for (var i = 0; i < this.supportedWKTs.length; i++) {
             if ( value.search(this.supportedWKTs[i]) > -1 ) {
-                alert(value);
                 return true;
             }
         }
@@ -945,9 +952,18 @@ geoknow.QueryResultView = Backbone.View.extend({
     },
     
     _previewGeometryOnMap: function(geom) {
-        if ( !this.isMapInitialized() ) {        
-            this.initializeMap();
-        }
+        //console.log(geom);
+        /*var geomStriped = geom.replace("^^<http://www.openlinksw.com/schemas/virtrdf#Geometry>","");
+        var datatypeIndex = geom.indexOf("^^");
+        geomStriped = geom.substring(0, datatypeIndex);
+        geomStriped = geomStriped.replace(/["']/g, "");
+        //console.log(geomStriped);
+        var polygonFeature = this.wktFormatter.read(geomStriped);
+        console.log(polygonFeature);
+        polygonFeature.attributes = {'geom': geomStriped};
+        polygonFeature.geometry.transform(this.projections.WGS84, this.projections.mapProj);
+        this.geoLayerFeatures[this.geoLayerFeatures] = polygonFeature;
+        console.log(this.geoLayerFeatures);*/
     },
     
     _previewFromHtmlMarkup: function()
@@ -994,7 +1010,8 @@ geoknow.QueryResultView = Backbone.View.extend({
                 $geometryIndexes.each(function (i, cellIndex) {
                     var $td = $(cells[cellIndex]);
                     var value = $td.html();
-                    alert("Cell "+index+" "+value);
+                    //alert("Cell "+index+" "+value);
+                    parentRef._previewGeometryOnMap(value);
                 });                
             }
         }
