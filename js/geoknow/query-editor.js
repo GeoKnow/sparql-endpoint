@@ -664,6 +664,7 @@ geoknow.QueryResultView = Backbone.View.extend({
     
     geoLayer: null,
     geoLayerFeatures: [],
+    geoLayerNewBatch: false,
     
     geoStyle: null,
     
@@ -711,6 +712,11 @@ geoknow.QueryResultView = Backbone.View.extend({
         if ( !this.isMapInitialized() ) {        
             this.initializeMap();
         }
+        
+        if ( this.geoLayerNewBatch ) {
+            this._populateGeometryLayer();
+            this.geoLayerNewBatch = false;
+        }
         this.$el.find('#results-nav-bar-map').addClass('active');
         this.$el.find('#results-nav-bar-table').removeClass('active');
         return false;
@@ -721,7 +727,7 @@ geoknow.QueryResultView = Backbone.View.extend({
     },
     
     _populateGeometryLayer: function() {
-        alert("populating");
+        //alert("populating");
         this.geoLayer.addFeatures(this.geoLayerFeatures);
     },
     
@@ -754,7 +760,7 @@ geoknow.QueryResultView = Backbone.View.extend({
         }, {context: this.geoContext
         });
         
-        alert('reached 2');
+        //alert('reached 2');
         this.geoLayer = new OpenLayers.Layer.Vector(
             'Preview Layer', { 
                 isBaseLayer: false,
@@ -764,7 +770,7 @@ geoknow.QueryResultView = Backbone.View.extend({
         this.map.addLayer(this.geoLayer);
         this._populateGeometryLayer();
 
-        alert('reached size : '+this.geoLayerFeatures.length);
+        //alert('reached size : '+this.geoLayerFeatures.length);
         // DEBUG geom
         /*
         var polygonFeatureW = this.wktFormatter.read("POLYGON((20.000001 37.000001, 20.000001 39.000001, 22.000001 39.000001, 22.000001 37.000001, 20.000001 37.000001))");
@@ -847,6 +853,10 @@ geoknow.QueryResultView = Backbone.View.extend({
         // Generate a preview on model's current result
 
         this._empty(null);
+        
+        // Clear geo data
+        this.geoLayerFeatures = [];
+        this.geoLayer.destroyFeatures;
         
         this._preview();
         
@@ -956,18 +966,27 @@ geoknow.QueryResultView = Backbone.View.extend({
         return normGeom;
     },
     
-    _previewGeometryOnMap: function(geom) {
-        //detremine geometry type literal
+    _normalizeGemetryString: function (geom) {
+        // Covert any url related symbols
         geom = decodeURIComponent(geom);
+
+        // Find projection type (Currently on handles WGS84 and Greek EPSG:2100
         var projIndex = geom.indexOf("EPSG/0/2100");
-        //alert("index "+projIndex);
+        var correctProjection = this.projections.WGS84;
+        if ( projIndex > -1 )
+            correctProjection = this.projections.grProj;
+        
+        // replace '+' (plus) with ' ' (space)
         geom = geom.replace(/[+']/g, " ");
+        
+        // Find where real WKT geometry begins
         var geomTypeLieral = "";
-        var earliestIndex = 99999;
+        var earliestIndex = 99999; // needed to avoid cases like MULTI'POLYGON' and 'POLYGON'
         var isBox2D = false;
         for ( var i = 0; i < this.supportedWKTs.length; i++ ) {
             var geomTypeIndex = geom.toUpperCase().search(this.supportedWKTs[i]);
             if ( geomTypeIndex > -1) {
+                // Special handling for BOX2D literals
                 if ( this.supportedWKTs[i].valueOf() == "BOX2D" ) {
                     isBox2D = true;
                 }
@@ -977,19 +996,21 @@ geoknow.QueryResultView = Backbone.View.extend({
             }
         }
         
-        //alert(earliestIndex);
-        //alert(geom.substring(earliestIndex));
+        // Cut off useless FRONT part if any
         geom = geom.substring(earliestIndex);
         
+        // BOX2D requires manual construction of POLYGON WKT
+        // BOX2D (minX minY, maxX, maxY)
+        // POLYGON( minX minY, maxX minY, maxX maxY, minX maxY, minX minY)
         if ( isBox2D ) {
             var matches = geom.match(/\(([^)]+)\)/);
             var coords = matches[1];
-            console.log("Regex returned "+matches[1]);
+            //console.log("Regex returned "+matches[1]);
             var coordsSplit = coords.split(","); 
             var minCoords = coordsSplit[0].split(" "); 
             var maxCoords = coordsSplit[1].split(" "); 
-            console.log("MIN Coords "+minCoords);
-            console.log("MAX Coords "+maxCoords);
+            //console.log("MIN Coords "+minCoords);
+            //console.log("MAX Coords "+maxCoords);
             //geom = geom.replace(/BOX2D/g, "POLYGON");
             geom = "POLYGON(" + minCoords[0] + " " + minCoords[1] + ", " +
                               + maxCoords[0] + " " + minCoords[1] + ", " +
@@ -997,22 +1018,36 @@ geoknow.QueryResultView = Backbone.View.extend({
                               + minCoords[0] + " " + maxCoords[1] + ", " +
                               + minCoords[0] + " " + minCoords[1] + ")";
         }
-        //alert(geom);
-        var datatypeIndex = geom.indexOf("^^");
-        var hrefEndIndex = geom.indexOf("</a>");
         
-        var geomStriped = geom;
+        // Cut off useless BACK part if any
+        var datatypeIndex = geom.indexOf("^^");
+        //console.log("Datatype Index "+datatypeIndex);
+        var hrefEndIndex = geom.indexOf("</a>");
+        //console.log("Href Index "+hrefEndIndex);
         if (datatypeIndex > -1) {
-            geomStriped = geom.substring(0, datatypeIndex);
+            geom = geom.substring(0, datatypeIndex);
         }
         if (hrefEndIndex > -1) {
-            geomStriped = geomStriped.substring(0, hrefEndIndex);
+            geom = geomStriped.substring(0, hrefEndIndex);
         }
-        geomStriped = geomStriped.replace(/["']/g, "");
+        
+        // replace leftover '"' (double quotes)
+        geom = geom.replace(/["']/g, "");
+        
+        var previewGeom = new Object();
+        previewGeom.geom = geom;
+        previewGeom.proj = correctProjection;
+        
+        return previewGeom;
+    },
+    
+    _previewGeometryOnMap: function(geom) {
+        //alert(decodeURI(geom));
+        var geomStriped = this._normalizeGemetryString(geom);
         console.log("Striped "+geomStriped);
-        var polygonFeature = this.wktFormatter.read(geomStriped);
-        polygonFeature.attributes = {'geom': geomStriped};
-        polygonFeature.geometry.transform(this.projections.WGS84, this.projections.mapProj);
+        var polygonFeature = this.wktFormatter.read(geomStriped.geom);
+        polygonFeature.attributes = {'geom': geomStriped.geom};
+        polygonFeature.geometry.transform(geomStriped.proj, this.projections.mapProj);
         console.log("Geom ID : "+polygonFeature.geometry);
         console.log("Geom ID : "+polygonFeature.geometry.id);
         this.geoLayerFeatures[this.geoLayerFeatures.length] = polygonFeature;
@@ -1054,17 +1089,23 @@ geoknow.QueryResultView = Backbone.View.extend({
             $cells.each(function (i, td) {
                 var $td = $(td);
                 var value = $td.html();
+                
                 if ( parentRef._containsGeometryType(value) ) {
                     geometryIndexes[geometryIndexes.length] = i;
+                    //parentRef.geoL
                 }
             });
-            alert(geometryIndexes);
+            //alert(geometryIndexes);
             var $geometryIndexes = $(geometryIndexes);
             for (var index = 1; index < rows.length; index++) {
                 var cells = rows[index].cells;
                 $geometryIndexes.each(function (i, cellIndex) {
                     var $td = $(cells[cellIndex]);
                     var value = $td.html();
+                    //alert("Length "+$td.find("a").length);
+                    if ( $td.find("a").length > 0 ) {
+                       value = $td.find("a").html();
+                    }
                     //alert("Cell "+index+" "+value);
                     parentRef._previewGeometryOnMap(value);
                 });                
