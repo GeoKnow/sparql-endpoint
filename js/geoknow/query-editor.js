@@ -959,23 +959,48 @@ geoknow.QueryResultView = Backbone.View.extend({
     _previewGeometryOnMap: function(geom) {
         //detremine geometry type literal
         geom = decodeURIComponent(geom);
+        var projIndex = geom.indexOf("EPSG/0/2100");
+        //alert("index "+projIndex);
         geom = geom.replace(/[+']/g, " ");
         var geomTypeLieral = "";
         var earliestIndex = 99999;
+        var isBox2D = false;
         for ( var i = 0; i < this.supportedWKTs.length; i++ ) {
             var geomTypeIndex = geom.toUpperCase().search(this.supportedWKTs[i]);
             if ( geomTypeIndex > -1) {
+                if ( this.supportedWKTs[i].valueOf() == "BOX2D" ) {
+                    isBox2D = true;
+                }
                 if ( earliestIndex > geomTypeIndex) {
                     earliestIndex = geomTypeIndex;
                 }
             }
         }
-        alert(earliestIndex);
-        alert(geom.substring(earliestIndex));
+        
+        //alert(earliestIndex);
+        //alert(geom.substring(earliestIndex));
         geom = geom.substring(earliestIndex);
         
+        if ( isBox2D ) {
+            var matches = geom.match(/\(([^)]+)\)/);
+            var coords = matches[1];
+            console.log("Regex returned "+matches[1]);
+            var coordsSplit = coords.split(","); 
+            var minCoords = coordsSplit[0].split(" "); 
+            var maxCoords = coordsSplit[1].split(" "); 
+            console.log("MIN Coords "+minCoords);
+            console.log("MAX Coords "+maxCoords);
+            //geom = geom.replace(/BOX2D/g, "POLYGON");
+            geom = "POLYGON(" + minCoords[0] + " " + minCoords[1] + ", " +
+                              + maxCoords[0] + " " + minCoords[1] + ", " +
+                              + maxCoords[0] + " " + maxCoords[1] + ", " +
+                              + minCoords[0] + " " + maxCoords[1] + ", " +
+                              + minCoords[0] + " " + minCoords[1] + ")";
+        }
+        //alert(geom);
         var datatypeIndex = geom.indexOf("^^");
         var hrefEndIndex = geom.indexOf("</a>");
+        
         var geomStriped = geom;
         if (datatypeIndex > -1) {
             geomStriped = geom.substring(0, datatypeIndex);
@@ -984,10 +1009,10 @@ geoknow.QueryResultView = Backbone.View.extend({
             geomStriped = geomStriped.substring(0, hrefEndIndex);
         }
         geomStriped = geomStriped.replace(/["']/g, "");
-        console.log(geomStriped);
+        console.log("Striped "+geomStriped);
         var polygonFeature = this.wktFormatter.read(geomStriped);
         polygonFeature.attributes = {'geom': geomStriped};
-        polygonFeature.geometry.transform(this.projections.grProj, this.projections.mapProj);
+        polygonFeature.geometry.transform(this.projections.WGS84, this.projections.mapProj);
         console.log("Geom ID : "+polygonFeature.geometry);
         console.log("Geom ID : "+polygonFeature.geometry.id);
         this.geoLayerFeatures[this.geoLayerFeatures.length] = polygonFeature;
