@@ -951,19 +951,49 @@ geoknow.QueryResultView = Backbone.View.extend({
         return false;
     },
     
+    _normalizeGeometry: function(geom) {
+        var normGeom = geom;
+        return normGeom;
+    },
+    
     _previewGeometryOnMap: function(geom) {
-        //console.log(geom);
-        /*var geomStriped = geom.replace("^^<http://www.openlinksw.com/schemas/virtrdf#Geometry>","");
+        //detremine geometry type literal
+        geom = decodeURIComponent(geom);
+        geom = geom.replace(/[+']/g, " ");
+        var geomTypeLieral = "";
+        var earliestIndex = 99999;
+        for ( var i = 0; i < this.supportedWKTs.length; i++ ) {
+            var geomTypeIndex = geom.toUpperCase().search(this.supportedWKTs[i]);
+            if ( geomTypeIndex > -1) {
+                if ( earliestIndex > geomTypeIndex) {
+                    earliestIndex = geomTypeIndex;
+                }
+            }
+        }
+        alert(earliestIndex);
+        alert(geom.substring(earliestIndex));
+        geom = geom.substring(earliestIndex);
+        
         var datatypeIndex = geom.indexOf("^^");
-        geomStriped = geom.substring(0, datatypeIndex);
+        var hrefEndIndex = geom.indexOf("</a>");
+        var geomStriped = geom;
+        if (datatypeIndex > -1) {
+            geomStriped = geom.substring(0, datatypeIndex);
+        }
+        if (hrefEndIndex > -1) {
+            geomStriped = geomStriped.substring(0, hrefEndIndex);
+        }
         geomStriped = geomStriped.replace(/["']/g, "");
-        //console.log(geomStriped);
+        console.log(geomStriped);
         var polygonFeature = this.wktFormatter.read(geomStriped);
-        console.log(polygonFeature);
         polygonFeature.attributes = {'geom': geomStriped};
-        polygonFeature.geometry.transform(this.projections.WGS84, this.projections.mapProj);
-        this.geoLayerFeatures[this.geoLayerFeatures] = polygonFeature;
-        console.log(this.geoLayerFeatures);*/
+        polygonFeature.geometry.transform(this.projections.grProj, this.projections.mapProj);
+        console.log("Geom ID : "+polygonFeature.geometry);
+        console.log("Geom ID : "+polygonFeature.geometry.id);
+        this.geoLayerFeatures[this.geoLayerFeatures.length] = polygonFeature;
+        //console.log(this.geoLayerFeatures.length);
+        //console.log("Geom ID : "+polygonFeature.geometry.id);
+        //console.log(this.geoLayerFeatures);
     },
     
     _previewFromHtmlMarkup: function()
