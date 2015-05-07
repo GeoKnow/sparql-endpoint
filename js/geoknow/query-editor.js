@@ -708,14 +708,14 @@ geoknow.QueryResultView = Backbone.View.extend({
     {
         this.$el.find('#results-map').show();
         this.$el.find('#results-body').hide();
-        
         if ( !this.isMapInitialized() ) {        
             this.initializeMap();
-        }
-        
-        if ( this.geoLayerNewBatch ) {
-            this._populateGeometryLayer();
-            this.geoLayerNewBatch = false;
+        } else {
+            if (this.geoLayerNewBatch) {
+                this._populateGeometryLayer();
+                this.geoLayerNewBatch = false;
+            }
+            this.map.zoomToExtent(this.geoLayer.getDataExtent());
         }
         this.$el.find('#results-nav-bar-map').addClass('active');
         this.$el.find('#results-nav-bar-table').removeClass('active');
@@ -741,7 +741,7 @@ geoknow.QueryResultView = Backbone.View.extend({
         this.map.addLayer(OSMLayer);
         //this.map.addLayer(wms);
         
-        this.map.zoomToMaxExtent();
+        //this.map.zoomToMaxExtent();
 
         this.geoContext = {
             getGeom: function (feature) {
@@ -778,7 +778,9 @@ geoknow.QueryResultView = Backbone.View.extend({
         polygonFeatureW.geometry.transform(this.projections.WGS84, this.map.getProjectionObject());
         this.geoLayer.addFeatures([polygonFeatureW]);
         */
-     
+        
+        this.map.zoomToExtent(this.geoLayer.getDataExtent());
+        
         this.editor = null;
         
         this.mapInited = true;
@@ -853,10 +855,6 @@ geoknow.QueryResultView = Backbone.View.extend({
         // Generate a preview on model's current result
 
         this._empty(null);
-        
-        // Clear geo data
-        this.geoLayerFeatures = [];
-        this.geoLayer.destroyFeatures;
         
         this._preview();
         
@@ -1081,6 +1079,13 @@ geoknow.QueryResultView = Backbone.View.extend({
             alert ('The result is malformed and cannot be previewed.')
             return;
         }
+        
+        this.geoLayerFeatures = [];
+        if ( this.geoLayer != null ) {
+            this.geoLayer.destroyFeatures();
+            this.geoLayerNewBatch = true;
+        }
+        
         var rows = $table.find("tr");
         var parentRef = this;
         var geometryIndexes = [];
@@ -1141,7 +1146,9 @@ geoknow.QueryResultView = Backbone.View.extend({
             .remove()
         
         this.$el.find("#results-body").append($table);
-
+        
+        this.previewOnTable();
+        
         return;
     },
     
