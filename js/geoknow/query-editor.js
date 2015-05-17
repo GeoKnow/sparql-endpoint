@@ -657,6 +657,26 @@ geoknow.QueryResultView = Backbone.View.extend({
 
     editor: null, /* for creating (readonly) previews for code snippets */
 
+    // OpenLayers Map
+    map: null,
+    mapInited: false,
+    geoContext: null,
+    
+    geoLayer: null,
+    geoLayerFeatures: [],
+    geoLayerNewBatch: false,
+    
+    geoStyle: null,
+    
+    wktFormatter: new OpenLayers.Format.WKT(),
+    
+    projections: {
+        WGS84: new OpenLayers.Projection("EPSG:4326"),
+        mapProj: new OpenLayers.Projection("EPSG:900913"),
+        grProj: new OpenLayers.Projection("EPSG:2100")
+        //Greek Proj EPSG 0/2100
+    },
+    
     templates: {
         caption: null,
         heading: null,
@@ -670,11 +690,104 @@ geoknow.QueryResultView = Backbone.View.extend({
         this.debug('Finished setup of delegated events')
         
         return {
+            "click   #results-nav-bar-table" : this.previewOnTable,
+            "click   #results-nav-bar-map" : this.previewOnMap,
         };    
     },
     
-    initialize: function()
+    previewOnTable: function()
     {
+        this.$el.find('#results-nav-bar-table').addClass('active');
+        this.$el.find('#results-nav-bar-map').removeClass('active');
+        this.$el.find('#results-body').show();
+        this.$el.find('#results-map').hide();
+        return false;
+    },
+    
+    previewOnMap: function()
+    {
+        this.$el.find('#results-map').show();
+        this.$el.find('#results-body').hide();
+        if ( !this.isMapInitialized() ) {        
+            this.initializeMap();
+        } else {
+            if (this.geoLayerNewBatch) {
+                this._populateGeometryLayer();
+                this.geoLayerNewBatch = false;
+            }
+            this.map.zoomToExtent(this.geoLayer.getDataExtent());
+        }
+        this.$el.find('#results-nav-bar-map').addClass('active');
+        this.$el.find('#results-nav-bar-table').removeClass('active');
+        return false;
+    },
+    
+    isMapInitialized: function() {
+        return this.mapInited;
+    },
+    
+    _populateGeometryLayer: function() {
+        //alert("populating");
+        this.geoLayer.addFeatures(this.geoLayerFeatures);
+    },
+    
+    // Initialize map
+    initializeMap: function() {
+        this.map = new OpenLayers.Map('results-map', {numZoomLevels: 32, projection: this.projections.mapProj, maxResolution: 1000});
+        var wms = new OpenLayers.Layer.WMS("OpenLayers WMS",
+                "http://vmap0.tiles.osgeo.org/wms/vmap0", {zoom: 100, layers: 'basic'});
+                var OSMLayer = new OpenLayers.Layer.OSM("OSM");
+                OSMLayer.sphericalMercator = true;
+        this.map.addLayer(OSMLayer);
+        //this.map.addLayer(wms);
+        
+        //this.map.zoomToMaxExtent();
+
+        this.geoContext = {
+            getGeom: function (feature) {
+                return feature.attributes.geom;
+            }
+        };
+        
+        this.geoStyle = new OpenLayers.Style({
+            strokeColor: "blue",
+            strokeWidth: 1,
+            pointRadius: 1,
+            cursor: "pointer",
+            fillColor: "blue",
+            fillOpacity: 0.5,
+            title: "${getGeom}"
+        }, {context: this.geoContext
+        });
+        
+        //alert('reached 2');
+        this.geoLayer = new OpenLayers.Layer.Vector(
+            'Preview Layer', { 
+                isBaseLayer: false,
+                styleMap: new OpenLayers.StyleMap(this.geoStyle)
+            });
+                    
+        this.map.addLayer(this.geoLayer);
+        this._populateGeometryLayer();
+
+        //alert('reached size : '+this.geoLayerFeatures.length);
+        // DEBUG geom
+        /*
+        var polygonFeatureW = this.wktFormatter.read("POLYGON((20.000001 37.000001, 20.000001 39.000001, 22.000001 39.000001, 22.000001 37.000001, 20.000001 37.000001))");
+        polygonFeatureW.attributes = {'geom': 'tomaras'};
+        polygonFeatureW.geometry.transform(this.projections.WGS84, this.map.getProjectionObject());
+        this.geoLayer.addFeatures([polygonFeatureW]);
+        */
+        
+        this.map.zoomToExtent(this.geoLayer.getDataExtent());
+        
+        this.editor = null;
+        
+        this.mapInited = true;
+    },
+    
+    initialize: function()
+    {        
         // Initialize templates
         
         this.templates.heading = _.template($('#results-success-heading-template').html());
@@ -689,9 +802,13 @@ geoknow.QueryResultView = Backbone.View.extend({
 
         this._empty(null);
 
+        // Hide map DIV
+        
+        this.$el.find('#results-map').hide();
+        
         // Subscribe to events
 
-        this.listenTo(this.model, "change:state change:result", this.render);
+        this.listenTo(this.model, "change:state change:result", this.render);        
         
         this.debug('Initialized')
     },
@@ -711,8 +828,6 @@ geoknow.QueryResultView = Backbone.View.extend({
         }
 
         this.$el.find('#results-body').empty();
-
-        this.editor = null;
         
         return;
     },
@@ -724,6 +839,7 @@ geoknow.QueryResultView = Backbone.View.extend({
         // Proceed only if model has entered idle state
         
         if (m.get('state') != 'idle') {
+            
             return;
         }
        
@@ -829,6 +945,115 @@ geoknow.QueryResultView = Backbone.View.extend({
         return;
     },
 
+    supportedWKTs: ["POLYGON","POINT","LINESTRING",
+                     "MULTIPOLYGON","MULTIPOINT","MULTILINESTRING",
+                     "GEOMETRYCOLLECTION", "BOX2D"],
+                
+    // Checks value of a cell for supported geometric types
+    _containsGeometryType: function(value) {
+        for (var i = 0; i < this.supportedWKTs.length; i++) {
+            if ( value.search(this.supportedWKTs[i]) > -1 ) {
+                return true;
+            }
+        }
+        return false;
+    },
+    
+    _normalizeGeometry: function(geom) {
+        var normGeom = geom;
+        return normGeom;
+    },
+    
+    _normalizeGemetryString: function (geom) {
+        // Covert any url related symbols
+        geom = decodeURIComponent(geom);
+
+        // Find projection type (Currently on handles WGS84 and Greek EPSG:2100
+        var projIndex = geom.indexOf("EPSG/0/2100");
+        var correctProjection = this.projections.WGS84;
+        if ( projIndex > -1 )
+            correctProjection = this.projections.grProj;
+        
+        // replace '+' (plus) with ' ' (space)
+        geom = geom.replace(/[+']/g, " ");
+        
+        // Find where real WKT geometry begins
+        var geomTypeLieral = "";
+        var earliestIndex = 99999; // needed to avoid cases like MULTI'POLYGON' and 'POLYGON'
+        var isBox2D = false;
+        for ( var i = 0; i < this.supportedWKTs.length; i++ ) {
+            var geomTypeIndex = geom.toUpperCase().search(this.supportedWKTs[i]);
+            if ( geomTypeIndex > -1) {
+                // Special handling for BOX2D literals
+                if ( this.supportedWKTs[i].valueOf() == "BOX2D" ) {
+                    isBox2D = true;
+                }
+                if ( earliestIndex > geomTypeIndex) {
+                    earliestIndex = geomTypeIndex;
+                }
+            }
+        }
+        
+        // Cut off useless FRONT part if any
+        geom = geom.substring(earliestIndex);
+        
+        // BOX2D requires manual construction of POLYGON WKT
+        // BOX2D (minX minY, maxX, maxY)
+        // POLYGON( minX minY, maxX minY, maxX maxY, minX maxY, minX minY)
+        if ( isBox2D ) {
+            var matches = geom.match(/\(([^)]+)\)/);
+            var coords = matches[1];
+            //console.log("Regex returned "+matches[1]);
+            var coordsSplit = coords.split(","); 
+            var minCoords = coordsSplit[0].split(" "); 
+            var maxCoords = coordsSplit[1].split(" "); 
+            //console.log("MIN Coords "+minCoords);
+            //console.log("MAX Coords "+maxCoords);
+            //geom = geom.replace(/BOX2D/g, "POLYGON");
+            geom = "POLYGON(" + minCoords[0] + " " + minCoords[1] + ", " +
+                              + maxCoords[0] + " " + minCoords[1] + ", " +
+                              + maxCoords[0] + " " + maxCoords[1] + ", " +
+                              + minCoords[0] + " " + maxCoords[1] + ", " +
+                              + minCoords[0] + " " + minCoords[1] + ")";
+        }
+        
+        // Cut off useless BACK part if any
+        var datatypeIndex = geom.indexOf("^^");
+        //console.log("Datatype Index "+datatypeIndex);
+        var hrefEndIndex = geom.indexOf("</a>");
+        //console.log("Href Index "+hrefEndIndex);
+        if (datatypeIndex > -1) {
+            geom = geom.substring(0, datatypeIndex);
+        }
+        if (hrefEndIndex > -1) {
+            geom = geomStriped.substring(0, hrefEndIndex);
+        }
+        
+        // replace leftover '"' (double quotes)
+        geom = geom.replace(/["']/g, "");
+        
+        var previewGeom = new Object();
+        previewGeom.geom = geom;
+        previewGeom.proj = correctProjection;
+        
+        return previewGeom;
+    },
+    
+    _previewGeometryOnMap: function(geom) {
+        //alert(decodeURI(geom));
+        var geomStriped = this._normalizeGemetryString(geom);
+        console.log("Striped "+geomStriped);
+        var polygonFeature = this.wktFormatter.read(geomStriped.geom);
+        polygonFeature.attributes = {'geom': geomStriped.geom};
+        polygonFeature.geometry.transform(geomStriped.proj, this.projections.mapProj);
+        console.log("Geom ID : "+polygonFeature.geometry);
+        console.log("Geom ID : "+polygonFeature.geometry.id);
+        this.geoLayerFeatures[this.geoLayerFeatures.length] = polygonFeature;
+        //console.log(this.geoLayerFeatures.length);
+        //console.log("Geom ID : "+polygonFeature.geometry.id);
+        //console.log(this.geoLayerFeatures);
+    },
+    
     _previewFromHtmlMarkup: function()
     {
         var cls = this.constructor
@@ -853,6 +1078,43 @@ geoknow.QueryResultView = Backbone.View.extend({
             this.error('The result is malformed: cannot parse an HTML table'); 
             alert ('The result is malformed and cannot be previewed.')
             return;
+        }
+        
+        this.geoLayerFeatures = [];
+        if ( this.geoLayer != null ) {
+            this.geoLayer.destroyFeatures();
+            this.geoLayerNewBatch = true;
+        }
+        
+        var rows = $table.find("tr");
+        var parentRef = this;
+        var geometryIndexes = [];
+        if ( rows.length > 1) {
+            $cells = $(rows[1].cells);
+            $cells.each(function (i, td) {
+                var $td = $(td);
+                var value = $td.html();
+                
+                if ( parentRef._containsGeometryType(value) ) {
+                    geometryIndexes[geometryIndexes.length] = i;
+                    //parentRef.geoL
+                }
+            });
+            //alert(geometryIndexes);
+            var $geometryIndexes = $(geometryIndexes);
+            for (var index = 1; index < rows.length; index++) {
+                var cells = rows[index].cells;
+                $geometryIndexes.each(function (i, cellIndex) {
+                    var $td = $(cells[cellIndex]);
+                    var value = $td.html();
+                    //alert("Length "+$td.find("a").length);
+                    if ( $td.find("a").length > 0 ) {
+                       value = $td.find("a").html();
+                    }
+                    //alert("Cell "+index+" "+value);
+                    parentRef._previewGeometryOnMap(value);
+                });                
+            }
         }
         
         // Render 
@@ -884,7 +1146,9 @@ geoknow.QueryResultView = Backbone.View.extend({
             .remove()
         
         this.$el.find("#results-body").append($table);
-
+        
+        this.previewOnTable();
+        
         return;
     },
     

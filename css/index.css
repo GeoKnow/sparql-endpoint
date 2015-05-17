@@ -45,6 +45,21 @@
     padding-right: 5px;
 } 
 
+
+#results-nav-bar-map a {
+    cursor: pointer;
+}
+
+#results-nav-bar-table a {
+    cursor: pointer;
+}
+
+#results-map { 
+    position: relative;
+    margin: 0px 0px; 
+    height: 490px;
+ }
+ 
 #results-body { 
     position: relative;
     margin: 0px 0px; 

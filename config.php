@@ -1,6 +1,7 @@
 <?php
 
 $config['logfile'] = 'log/error.log';
+//$config['logfile'] = '../log/error.log';
 
 $config['result_formats'] = array(
     'application/json' => array(
