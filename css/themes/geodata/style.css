@@ -68,20 +68,30 @@
 }
 
 #top-container > .tab-pane > .tab h1 {
-    margin: 30px 0px;
+    margin: 35px 0px;
 }
 
 #top-container > .tab-pane > .tab h2 {
-    margin: 20px 0px;
+    margin: 27px 0px;
 }
 
 #top-container > .tab-pane > .tab h3 {
-    margin: 15px 0px;
+    margin: 22px 0px;
+}
+
+#top-container > .tab-pane > .tab h4 {
+    margin: 18px 0px;
 }
 
 #top-container > .tab-pane > .tab p {
     line-height: 1.5em;
     margin: 10px 200px 10px 0px;
+}
+
+#top-container > .tab-pane > .tab ol,
+#top-container > .tab-pane > .tab ul {
+    margin: 10px 200px 10px 0px;
+    padding-left: 16px;
 }
 
 #top-container > .tab-pane > .tab > pre,

@@ -1,0 +1,79 @@
+  
+  <h3>Welcome to Inspire2RDF: A suite of tools for exposing INSPIRE metadata and data as linked data</h3>
+
+    <h4>Software Resources for testing</h4>
+
+    <ol>
+    
+      <li>HUMBOLDT Alignments to INSPIRE for datasets from geodata.gov.gr: <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1858/HUMBOLDT_Alignments_GR.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1858/HUMBOLDT_Alignments_GR.zip</a></li>
+   
+      <li>XSL stylesheets for converting INSPIRE-aligned GML DATA into RDF/XML (conforming to GeoSPARQL specifications for geometries) for seven INSPIRE Data Themes (Annex I):<br><a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1882/INSPIRE2RDF_Data_Annex_I_XSLT.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1882/INSPIRE2RDF_Data_Annex_I_XSLT.zip</a><br>You can edit any of these files in order to prepare suitable configuration settings for converting another geospatial dataset into its GeoSPARQL-compliant RDF representation.</li>
+   
+      <li>XSL stylesheet for converting INSPIRE metadata from XML into RDF/XML representation:<br><a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1883/INSPIRE2RDF_Metadata_XSLT.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1883/INSPIRE2RDF_Metadata_XSLT.zip</a></li>
+
+      <li>Transforming INSPIRE-aligned data and metadata into RDF can be performed through <strong>TripleGeo</strong> utility, using suitably configured XSL stylesheets. The Java source code for TripleGeo is freely available from <a class="external" href="https://github.com/GeoKnow/TripleGeo">https://github.com/GeoKnow/TripleGeo</a>.</li>
+
+      <li>Querying INSPIRE-compliant Catalogue Services for the Web (CSW) using SPARQL can be performed with the <strong>TripleGeo-CSW</strong> utility. The python source code for TripleGeo-CSW is freely available from <a class="external" href="https://github.com/GeoKnow/TripleGeo-CSW">https://github.com/GeoKnow/TripleGeo-CSW</a>.</li>
+    
+    </ol>
+
+    <h4>Datasets</h4>
+
+    <p>Data from <strong>geodata.gov.gr (GREECE)</strong> as used in web service <a class="external" href="http://geodata.gov.gr/sparql">http://geodata.gov.gr/sparql</a>:</p>
+
+    <p>(1) Original GML data from geodata.gov.gr for seven INSPIRE Data Themes (Annex I):  <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1862/Original_GML_data_GR.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1862/Original_GML_data_GR.zip</a></p>
+
+    <p>(2) INSPIRE-aligned GML data from geodata.gov.gr : <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1857/INSPIRE_aligned_GML_data_GR.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1857/INSPIRE_aligned_GML_data_GR.zip</a></p>
+
+    <p>(3) INSPIRE-compliant RDF data in GeoSPARQL (in Greek Grid 87 georeference) from geodata.gov.gr (converted from (2)): <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1874/GeoSparqlRDF_egsa87_DATA_geodata_gov_gr.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1874/GeoSparqlRDF_egsa87_DATA_geodata_gov_gr.zip</a></p>
+
+    <p>(4) INSPIRE-compliant RDF data for Parliament triple store (variant of GeoSPARQL geometries, in Greek Grid 87 georeference) from geodata.gov.gr (converted from (2)): <br><a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1875/ParliamentRDF_egsa87_DATA_geodata_gov_gr.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1875/ParliamentRDF_egsa87_DATA_geodata_gov_gr.zip</a></p>
+
+    <p>(5) INSPIRE-compliant RDF data in Virtuoso geometries (non-GeoSPARQL compliant, in WGS84 georeference) from geodata.gov.gr (converted from (2)): <br><a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1872/VirtuosoRDF_wgs84_DATA_geodata_gov_gr.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1872/VirtuosoRDF_wgs84_DATA_geodata_gov_gr.zip</a></p>
+
+    <p>Data from <strong>other European countries:</strong></p>
+
+    <p>(6) INSPIRE-aligned GML sample data for Italy, the Netherlands, and the UK: <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1884/INSPIRE_European_sample_GML_data.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1884/INSPIRE_European_sample_GML_data.zip</a></p>
+
+    <p>(7) INSPIRE-compliant RDF data with GeoSPARQL geometries (converted from data in (6)): <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1860/GeoSparqlRDF_European_sample_DATA.zip">https://web.imis.athena-innovation.gr/redmine/attachments/download/1860/GeoSparqlRDF_European_sample_DATA.zip</a></p>
+
+
+    <h4>Queries</h4>
+
+    <p>Various sets of SPARQL Queries are available for execution through the web interface at <a class="external" href="http://geodata.gov.gr/sparql">http://geodata.gov.gr/sparql</a>.</p>
+
+    <p>On INSPIRE <strong>metadata</strong> from geodata.gov.gr:</p>
+
+    <p>(i) using <strong><em>Virtuoso</em></strong> as backend: <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1903/Virtuoso_Inspire_metadata.txt">https://web.imis.athena-innovation.gr/redmine/attachments/download/1903/Virtuoso_Inspire_metadata.txt</a></p>
+
+    <p>(ii) using <strong><em>Parliament</em></strong> as backend: <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1901/Parliament_Inspire_metadata.txt">https://web.imis.athena-innovation.gr/redmine/attachments/download/1901/Parliament_Inspire_metadata.txt</a></p>
+
+    <p>On INSPIRE <strong>data</strong> from geodata.gov.gr:</p>
+
+    <p>(iii) using <strong><em>Virtuoso</em></strong> as backend: <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1902/Virtuoso_Inspire_data.txt">https://web.imis.athena-innovation.gr/redmine/attachments/download/1902/Virtuoso_Inspire_data.txt</a></p>
+
+    <p>(iv) using <strong><em>Parliament</em></strong> as backend: <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1900/Parliament_Inspire_data.txt">https://web.imis.athena-innovation.gr/redmine/attachments/download/1900/Parliament_Inspire_data.txt</a></p>
+
+    <p>On INSPIRE Catalogue Services (<strong>CSW</strong>) across Europe:</p>
+
+    <p>(v) through TripleGeo-CSW middleware: <a class="external" href="https://web.imis.athena-innovation.gr/redmine/attachments/download/1899/CSW_middleware_metadata.txt">https://web.imis.athena-innovation.gr/redmine/attachments/download/1899/CSW_middleware_metadata.txt</a></p>
+
+    <a name="License"></a>
+
+
+    <h4>License</h4>
+
+    <p>The software components of this project are licensed under the GPL v3 License <a class="external" href="https://github.com/GeoKnow/TripleGeo/blob/master/LICENSE">https://github.com/GeoKnow/TripleGeo/blob/master/LICENSE</a>.</p>
+
+    <p>Datasets for Greece taken from <a class="external" href="http://geodata.gov.gr">http://geodata.gov.gr</a> are licensed under CC-BY 3.0 <a class="external" href="http://creativecommons.org/licenses/by/3.0/">http://creativecommons.org/licenses/by/3.0/</a>.</p>
+
+    <p>Sample GML data for the Netherlands are available at <a class="external" href="https://code.google.com/p/inspire-foss/source/browse/#svn%2Ftrunk%2Fetl%2FNL.Kadaster%253Fstate%253Dclosed">https://code.google.com/p/inspire-foss/source/browse/#svn%2Ftrunk%2Fetl%2FNL.Kadaster%253Fstate%253Dclosed</a> under the GPL v3 License <a class="external" href="https://github.com/GeoKnow/TripleGeo/blob/master/LICENSE">https://github.com/GeoKnow/TripleGeo/blob/master/LICENSE</a>.</p>
+
+    <p>Sample GML data for Italy were taken from <a class="external" href="http://fmepedia.safe.com/articles/Samples_and_Demos/INSPIRE-Geographic-Names-Demo">http://fmepedia.safe.com/articles/Samples_and_Demos/INSPIRE-Geographic-Names-Demo</a></p>
+
+    <p>Sample GML data for the UK are available through <a class="external" href="http://www.landregistry.gov.uk/market-trend-data/inspire/inspire-downloads">http://www.landregistry.gov.uk/market-trend-data/inspire/inspire-downloads</a> under OGL <a class="external" href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/</a></p>
+
+
+
+    <p><em><br>Development: © 2014 Institute for the Management of Information Systems,<br>Athena Research Center, Greece.<br>Please send any comments to: kpatro AT dblab DOT ece DOT ntua DOT gr<br>Last updated: 28 May 2014 11:00:00 EET.</em></p>
+
